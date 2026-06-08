@@ -28,7 +28,7 @@ switch ($action){
     echo json_encode($user);
     break;
 
-    case 'getOnePost':
+    case 'getOneExpense':
     $id = isset($_REQUEST['id']) ?$_REQUEST['id'] : null;
     $query = "SELECT * FROM expenses WHERE id = :id";
     $stmt =$db->prepare($query);
@@ -59,7 +59,7 @@ switch ($action){
         }
         break;
 
-    case 'editPost': 
+    case 'editExpense': 
         if(isset($_POST['title']) && isset($_POST['description']) && isset($_POST['amount']) && isset($_POST['category_id']) && isset($_POST['expense_date']) && isset($_POST['payment_method_id']) && isset($_POST['id'])){
        $title = $_POST['title'];
        $description = $_POST['description'];
@@ -84,33 +84,6 @@ switch ($action){
         exit();                                                                                 
         }
         break;
-        
-    // case 'editPost': 
-    //     if(isset($_POST['title']) && isset($_POST['amount']) && isset($_POST['category_id']) && isset($_POST['expense_date']) && isset($_POST['payment_method_id']) && isset($_POST['id'])){
-    //        $title =$_POST['title'];
-    //        $description = isset($_POST['description']) ?$_POST['description'] : "";
-    //        $amount =$_POST['amount'];
-    //        $category_id =$_POST['category_id']; 
-    //        $expense_date =$_POST['expense_date']; 
-    //        $payment_method_id = isset($_POST['payment_method']) ?$_POST['payment_method'] : null;
-    //        $id =$_POST['id'];
-
-    //        $query = "UPDATE expenses SET title=:title, description=:description, amount=:amount, category_id=:category_id, expense_date=:expense_date, payment_method_id=:payment_method_id WHERE id=:id";
-                      
-    //        $stmt =$db->prepare($query);
-    //        $stmt->execute([
-    //             ":title" =>$title,
-    //             ":description" =>$description,
-    //             ":amount" =>$amount,
-    //             ":category_id" =>$category_id,
-    //             ":expense_date" =>$expense_date,
-    //             ":payment_method_id" =>$payment_method_id,
-    //             ":id" =>$id
-    //         ]);
-    //         echo json_encode(['status'=>'success']);
-    //         exit();                 
-    //     }                                                                               
-    //     break;
 
     case 'addNewUser':
    $query = "INSERT INTO users (category_id, email, password, role) VALUES (:category_id, :email, :password, :role)";
@@ -132,7 +105,7 @@ switch ($action){
     }
     break;
     
-    case 'addNewPost':
+    case 'addNewExpense':
         $user_id = 1; 
         $title =$_POST['title'];
         $description =$_POST['description'];
@@ -157,4 +130,6 @@ switch ($action){
         
         exit(); 
         break;
+
+        
 }

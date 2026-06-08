@@ -50,7 +50,6 @@
         </form>
       </div>
 
-      <!-- links -->
       <div
         class="d-flex justify-content-between align-items-center gap-3 mx-auto pt-3"
       >

@@ -53,13 +53,6 @@ $query = "SELECT * FROM users ORDER BY id DESC";
             <?php foreach($users as $user): ?>
               <?php
                 $role_badge = "";
-                // if($user['role'] == "user"){
-                //   $role_badge = "bg-success";
-                // }else if ($user['role'] == 'editor'){
-                //   $role_badge = "bg-info";
-                // }else if ($user['role'] == 'admin'){
-                //   $role_badge = "bg-primary";
-                // }
                 switch($user['role']){
                   case'user';
                   $role_badge = "bg-success";

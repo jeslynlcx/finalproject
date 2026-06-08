@@ -3,36 +3,8 @@ require('header.php');
 
 $displayAmount = isset($expenses['amount']) ? abs($expenses['amount']) : '';
 $id = $_GET['id'];
-$expenses = file_get_contents("http://localhost/finalproject/backend/index.php?action=getOnePost&id=$id");
+$expenses = file_get_contents("http://localhost/finalproject/backend/index.php?action=getOneExpense&id=$id");
 $expenses = json_decode($expenses, true);
-// if(isset($_GET['id'])){
-//     $id = $_GET['id'];
-// $query = "SELECT * FROM expenses WHERE id=:id";
-
-// $stmt = $db->prepare($query);
-// $stmt->execute([
-//     ':id' =>$id
-// ]);
-// $expenses = $stmt->fetchAll();
-// }
-// if(isset($_POST['title']) && isset($_POST['description']) && isset($_POST['amount']) && isset($_POST['id'])){
-//     $title = $_POST['title'];
-//     $description = isset($_POST['description']) ? $_POST['description'] : "review";
-//     $amount = $_POST['amount'];
-//     $expenseDate = $_POST['expenseDate'];
-//     $id = $_POST['id'];
-
-//     $query = "UPDATE expenses SET title=:title, description=:description, amount=:amount, expenseDate=:expenseDate WHERE id=:id";
-//     $stmt = $db->prepare($query);
-//     $stmt->execute([
-//         ":title"=>$title,
-//         ":description"=>$description,
-//         ":amount"=>$amount,
-//         ":expenseDate"=>$expenseDate,
-//         ":id"=>$id
-//     ]);
-//     header("Location: manage-post.php");
-// }
 ?>
 <!DOCTYPE html>
 <html>
@@ -74,14 +46,14 @@ $expenses = json_decode($expenses, true);
         <h1 class="h1">Edit Expenses</h1>
       </div>
         <div class="card mb-2 p-4">
-            <form method="POST" id='editPostForm '>
+            <form method="POST" id='editExpenseForm'>
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" value="<?= $expenses['title']?>"required />
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="description" name="description" value="<?= $expenses['description']?>" required/>
+                <input type="text" class="form-control" id="description" name="description" value="<?= $expenses['description']?>" />
             </div>
              <div class="mb-3">
           <label for="amount" class="form-label">Amount</label>
@@ -120,10 +92,10 @@ $expenses = json_decode($expenses, true);
             </div>
             </form>
         </div>
+      
       <div class="text-center">
-        <a href="manage-post.php" class="btn btn-link btn-sm"
-          ><i class="bi bi-arrow-left"></i> Back to Posts</a
-        >
+        <a href="manage-expenses.php" class="btn-sm text-black fw-bold text-decoration-none"
+          ><i class="bi bi-arrow-left-circle"></i> Back to All</a>
       </div>
     </div>
 
@@ -134,14 +106,14 @@ $expenses = json_decode($expenses, true);
     ></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
       <script>
-        $('#editPostForm').on('submit', (function(event){
+        $('#editExpenseForm').on('submit', (function(event){
           event.preventDefault();
           console.log("Form submitted");
           $.ajax({
             url: "http://localhost/finalproject/backend/index.php",
             type: "POST", 
             data: {
-              action: "editPost",
+              action: "editExpense",
               title: $('#title').val(),
               description: $('#description').val(),
               amount: $('#amount').val(),
@@ -153,7 +125,7 @@ $expenses = json_decode($expenses, true);
             success: function(response){
                 console.log(response);
                 alert("Successfully Edited!")
-                window.location.href = "http://localhost/finalproject/manage-post.php";
+                window.location.href = "http://localhost/finalproject/manage-expenses.php";
 
             },
             error: function(xhr, status, error){

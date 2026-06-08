@@ -81,7 +81,7 @@ $expenses = $stmt->fetchAll();
                       target="_self"
                       class="btn btn-primary btn-sm me-2"
                       ><i class="bi bi-eye"></i></a>
-                    <a href="manage-post-edit.php?id=<?=$expense['id']?>"
+                    <a href="manage-expenses-edit.php?id=<?=$expense['id']?>"
                       class="btn btn-secondary btn-sm me-2"><i class="bi bi-pencil"></i></a>
                       <form method="POST" class="d-inline">
                     <button class="btn btn-danger btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
@@ -95,10 +95,10 @@ $expenses = $stmt->fetchAll();
           </tbody>
         </table>
       </div>
+  
       <div class="text-center">
-        <a href="index.php" class="btn btn-link btn-sm"
-          ><i class="bi bi-arrow-left"></i> Back to Dashboard</a
-        >
+        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"
+          ><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
       </div>
     </div>
 

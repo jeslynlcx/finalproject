@@ -1,27 +1,5 @@
 <?php
 require('header.php');
-
-// $query = "INSERT INTO posts (title, description, amount,status, post_by) VALUES (:title, :description, :amount,:status, :post_by)";
-
-// if(isset($_POST['title']) && isset($_POST['description']) && isset($_POST['amount']) && isset($_POST['post_by'])){
-//     $title = $_POST['title'];
-//     $description = $_POST['description'];
-//     $amount = $_POST['amount'];
-    
-
-//     $stmt = $db->prepare($query);
-//     $stmt->execute([
-//         ":title"=>$title,
-//         ":description" =>$description,
-//         ":amount" =>$amount,
-       
-//     ]);
-//     header("location:manage-post.php");
-// }
-
-
-// $posts = $stmt->fetchAll();
-
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +36,7 @@ require('header.php');
       </div>
       <div class="card mb-2 p-4">
         <form method="POST" id='addPostForm'>
-        <input type="hidden" name="action" value="addNewPost">
+        <input type="hidden" name="action" value="addNewExpense">
           <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input type="text" class="form-control" id="title" name="title" required/>
@@ -107,9 +85,10 @@ require('header.php');
         </form>
       </div>
       <div class="text-center">
-        <a href="index.php" class="btn btn-link btn-sm"
-          ><i class="bi bi-arrow-left"></i> Back to All</a>
+        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"
+          ><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
       </div>
+      
     </div>
 
     <script
@@ -126,7 +105,7 @@ require('header.php');
             url: "http://localhost/finalproject/backend/index.php",
             type: "POST",
             data: {
-              action: "addNewPost",
+              action: "addNewExpense",
               title: $('#title').val(),
               description: $('#description').val(),
               amount: $('#amount').val(),
@@ -134,10 +113,10 @@ require('header.php');
               payment_method_id: $('#payment_method_id').val(),
               expense_date: $('#expense_date').val(),
             },
-            success: function(response){
+          success: function(response){
                 console.log(response);
-                alert("Successfully Inserted Data!")
-                window.location.href = "http://localhost/finalproject/manage-post.php";
+                alert("Successfully Added!")
+                window.location.href = "http://localhost/finalproject/manage-expenses.php";
 
             },
             error: function(xhr, status, error){
