@@ -36,6 +36,15 @@ switch ($action){
     $expense =$stmt->fetch(PDO::FETCH_ASSOC);
     echo json_encode($expense);
     break;
+
+    case 'getOneCategory':
+        $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
+        $query = "SELECT * FROM categories WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->execute([':id' => $id]);
+        $category = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode($category);
+        break;
     
 
     case 'editUser': 
@@ -131,5 +140,42 @@ switch ($action){
         exit(); 
         break;
 
+        case 'editCategoryBudget':
+        if (isset($_POST['category_id']) && isset($_POST['amount'])) {
+            $category_id = $_POST['category_id'];
+            $amount = $_POST['amount'];
+            $user_id = 1; 
+            $updateQuery = "UPDATE budgets SET budget_amount=:amount WHERE category_id=:category_id AND user_id=:user_id";
+            
+            $stmt = $db->prepare($updateQuery);
+            $stmt->execute([
+                'amount' => $amount,
+                'category_id' => $category_id,
+                'user_id' => $user_id
+            ]);
+
+            echo json_encode(['status' => 'success']);
+            exit();
+        }
+        break;
+
+        case 'editPaymentBudget':
+        if (isset($_POST['payment_id']) && isset($_POST['payment_amount'])) {
+            $payment_id = $_POST['payment_id'];
+            $payment_amount = $_POST['payment_amount'];
+            $user_id = 1; 
+            $updateQuery = "UPDATE budgets SET payment_amount=:payment_amount WHERE payment_id=:payment_id AND user_id=:user_id";
+            
+            $stmt = $db->prepare($updateQuery);
+            $stmt->execute([
+                'payment_amount' => $payment_amount,
+                'payment_id' => $payment_id,
+                'user_id' => $user_id
+            ]);
+
+            echo json_encode(['status' => 'success']);
+            exit();
+        }
+        break;
         
 }
