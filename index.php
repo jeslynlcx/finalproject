@@ -1,5 +1,11 @@
 <?php
 require('header.php');
+$user_id = $_SESSION['user']['id'];
+
+$expenseQuery = "SELECT IFNULL(SUM(amount), 0) AS total_expenses FROM expenses WHERE user_id = :user_id";
+$stmtExpense = $db->prepare($expenseQuery);
+$stmtExpense->execute([':user_id' => $user_id]);
+$totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
 
 $query = "SELECT 
             expenses.*, 
@@ -8,22 +14,28 @@ $query = "SELECT
           FROM expenses
           LEFT JOIN categories ON expenses.category_id = categories.id
           LEFT JOIN payments ON expenses.payment_method_id = payments.id
+          WHERE expenses.user_id = :user_id
           ORDER BY expenses.id DESC";
 
-        $stmt = $db->prepare($query);
-        $stmt->execute([]);
-        $expenses = $stmt->fetchAll();
-        
-$totalRow = $db->query("SELECT SUM(amount) as total FROM expenses")->fetch(PDO::FETCH_ASSOC);
-$total = $totalRow['total'] ? abs($totalRow['total']) : 1; 
+$stmt = $db->prepare($query);
+$stmt->execute([':user_id' => $user_id]); 
+$expenses = $stmt->fetchAll();
 
-$results = $db->query("SELECT 
+$totalRowStmt = $db->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id = :user_id");
+$totalRowStmt->execute([':user_id' => $user_id]);
+$totalRow = $totalRowStmt->fetch(PDO::FETCH_ASSOC);
+$total = $totalRow['total'] ? ($totalRow['total']) : 1; 
+
+$resultsStmt = $db->prepare("SELECT 
                         expenses.category_id,
                         categories.category_name, 
                         SUM(expenses.amount) as total_category_amount
                        FROM expenses 
                        LEFT JOIN categories ON expenses.category_id = categories.id 
-                       GROUP BY expenses.category_id, categories.category_name")->fetchAll(PDO::FETCH_ASSOC);
+                       WHERE expenses.user_id = :user_id
+                       GROUP BY expenses.category_id, categories.category_name");
+$resultsStmt->execute([':user_id' => $user_id]);
+$results = $resultsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $colors = [
     1 => '#BCD2E8',
@@ -35,16 +47,17 @@ $colors = [
     7 => '#173150',
     8 => '#0d1d31'
 ];
-$totalRow = $db->query("SELECT SUM(amount) as total FROM expenses")->fetch(PDO::FETCH_ASSOC);
-$total = $totalRow['total'] ? abs($totalRow['total']) : 1; 
 
-$payment_results = $db->query("SELECT 
+$paymentResultsStmt = $db->prepare("SELECT 
                         expenses.payment_method_id,
                         payments.payment_name, 
                         SUM(expenses.amount) as total_payment_amount
                        FROM expenses
                        LEFT JOIN payments ON expenses.payment_method_id = payments.id
-                       GROUP BY expenses.payment_method_id, payments.payment_name")->fetchAll(PDO::FETCH_ASSOC);
+                       WHERE expenses.user_id = :user_id
+                       GROUP BY expenses.payment_method_id, payments.payment_name");
+$paymentResultsStmt->execute([':user_id' => $user_id]);
+$payment_results = $paymentResultsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $payment_colors = [
     1 => '#BCD2E8',
@@ -65,6 +78,11 @@ $payment_colors = [
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="theme.css" />
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style type="text/css">
         body {
             background: #f1f1f1;
@@ -73,10 +91,6 @@ $payment_colors = [
             border: 1px black solid;
             border-radius: 50%;
         }
-        /* .date{
-            font-size: 10px;
-            color: black;
-        } */
         .expenses-table{
             font-size: 0.75rem;
             color: #6c7a8f;
@@ -99,6 +113,11 @@ $payment_colors = [
             border-radius: 50%;
             padding: 1px 4px;
         }
+        .card{
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+
+        }
+        
     </style>
 </head>
 
@@ -106,13 +125,13 @@ $payment_colors = [
 <!-- NAVBARRRRRR------------------>
     <div class="container-fluid py-3">
     <div class="mx-auto dashboard">
-        <nav class="navbar navbar-expand-lg custom-navbar">            
-            <a href="#" class="navbar-brand fw-bold fs-3">Money Manager</a>
+        <nav class="navbar navbar-expand-lg custom-navbar pb-0">            
+            <span id="themeToggle" class="navbar-brand fw-bold fs-3 p-2">Money Manager</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <ul class="navbar-nav ms-auto align-items-center gap-2 p-2">
                     <li class="nav-item">
                         <a href="manage-expenses-add.php" class="nav-link custom-link active-link"><i class="bi bi-plus-circle"></i> Add Expenses</a>
                     </li>
@@ -136,28 +155,12 @@ $payment_colors = [
     
 <!-- NAVBARRRRRR------------------>
 <!-- Total Datassss------------------------------ -->
-        <div class="row justify-content-center justify-content-around pb-4 mt-0">
-            <div class="row g-4 col-md-4">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <p>Total Income</p>
-                        <h2>RM</h2>                
-                    </div>
-                </div>
-            </div>
-            <div class="row g-4 col-md-4">
-                <div class="card dashboard-card">
+        <div class="row justify-content-start justify-content-around pb-4 mt-0">
+            <div class="row col-12">
+                <div class="card">
                     <div class="card-body">
                         <p>Total Expenses</p>
-                        <h2>RM</h2>                
-                    </div>
-                </div>
-            </div>
-            <div class="row g-4 col-md-4">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <p>Balance</p>
-                        <h2>RM</h2>
+                        <h2 class="fs-1 fw-bold">RM<?= ($totalExpenses) ?></h2>                
                     </div>
                 </div>
             </div>
@@ -166,7 +169,7 @@ $payment_colors = [
 <!-- Expenses ------------------------>
         <div class="row">
             <div class="col-md-7">
-            <div class="card dashboard-card">
+            <div class="card">
                 <div class="card-body">       
                 <div class="tableno">      
                     <table class="table">
@@ -180,7 +183,7 @@ $payment_colors = [
                     <?php foreach($expenses as $expense): ?>
                         <tr>
                         <td>
-                        <span class="me-3 fw-bold"><?= $expense['title']?></span>
+                        <span class="me-5 fw-bold"><?= $expense['title']?></span>
                         <br>
                         <span class="expenses-table"><?= $expense['category_name']?></span>
                         <span class="date expenses-table"><?= $expense['expense_date']?></span>
@@ -211,12 +214,12 @@ $payment_colors = [
                                         </h6>
                                         
                                         <div class="d-flex align-items-center gap-1">
-                                            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" 
+                                            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" 
                                                     type="button" data-bs-target="#chartCarousel" data-bs-slide="prev" 
                                                     style="width: 26px; height: 26px; border-radius: 50%;">
                                                 <i class="bi bi-chevron-left" style="font-size: 0.75rem;"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" 
+                                            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" 
                                                     type="button" data-bs-target="#chartCarousel" data-bs-slide="next" 
                                                     style="width: 26px; height: 26px; border-radius: 50%;">
                                                 <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
@@ -229,9 +232,9 @@ $payment_colors = [
                                             <?php 
                                             $accumulated = 0;
                                             foreach ($results as $row) {
-                                                $pct = (abs($row['total_category_amount']) / $total) * 100;
-                                                if ($pct > 0) {
-                                                    $accumulated += $pct;
+                                                $percent = (($row['total_category_amount']) / $total) * 100;
+                                                if ($percent > 0) {
+                                                    $accumulated += $percent;
                                                     echo $colors[$row['category_id']] . " 0 " . $accumulated . "%,";
                                                 }
                                             }
@@ -240,14 +243,14 @@ $payment_colors = [
                                         
                                         <ul class="list-group list-group-flush">
                                             <?php foreach ($results as $row): 
-                                                $pct = round((abs($row['total_category_amount']) / $total) * 100);
-                                                if ($pct > 0): ?>
+                                                $percent = round((($row['total_category_amount']) / $total) * 100);
+                                                if ($percent > 0): ?>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center p-0" style="border:none; background:transparent;">
                                                     <div>
                                                         <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $colors[$row['category_id']] ?>;"></span>
                                                         <strong><?= $row['category_name'] ?></strong>
                                                     </div>
-                                                    <span class="text-muted" style="font-size: 0.85rem;"><?= $pct ?>% (RM <?= number_format(abs($row['total_category_amount']), 2) ?>)</span>
+                                                    <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= number_format(($row['total_category_amount']), 2) ?>)</span>
                                                 </li>
                                             <?php endif; endforeach; ?>
                                         </ul>
@@ -257,9 +260,10 @@ $payment_colors = [
                             </div>
 
                             <div class="carousel-item">
-                                <div class="p-4"> <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h6 class="fw-bold mb-0 text-muted small text-uppercase tracking-wider">
-                                            Analytics <span class="text-dark fw-bold ms-1" style="font-size: 0.75rem;">(By Payment)</span>
+                                <div class="p-4"> 
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="fw-bold mb-0 text-muted small text-uppercase tracking-wider">Analytics 
+                                            <span class="text-dark fw-bold ms-1" style="font-size: 0.75rem;">(By Payment)</span>
                                         </h6>
                                         
                                         <div class="d-flex align-items-center gap-1">
@@ -281,9 +285,9 @@ $payment_colors = [
                                             <?php 
                                             $accumulated_pay = 0;
                                             foreach ($payment_results as $row) {
-                                                $pct = (abs($row['total_payment_amount']) / $total) * 100;
-                                                if ($pct > 0) {
-                                                    $accumulated_pay += $pct;
+                                                $percent = (($row['total_payment_amount']) / $total) * 100;
+                                                if ($percent > 0) {
+                                                    $accumulated_pay += $percent;
                                                     echo ($payment_colors[$row['payment_method_id']] ?? '#6c7a8f') . " 0 " . $accumulated_pay . "%,";
                                                 }
                                             }
@@ -292,14 +296,14 @@ $payment_colors = [
                                         
                                         <ul class="list-group list-group-flush">
                                             <?php foreach ($payment_results as $row): 
-                                                $pct = round((abs($row['total_payment_amount']) / $total) * 100);
-                                                if ($pct > 0): ?>
+                                                $percent = round((($row['total_payment_amount']) / $total) * 100);
+                                                if ($percent > 0): ?>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center p-2" style="border:none; background:transparent;">
                                                     <div>
                                                         <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $payment_colors[$row['payment_method_id']] ?? '#6c7a8f' ?>;"></span>
                                                         <strong><?= $row['payment_name'] ?></strong>
                                                     </div>
-                                                    <span class="text-muted" style="font-size: 0.85rem;"><?= $pct ?>% (RM <?= (abs($row['total_payment_amount'])) ?>)</span>
+                                                    <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= (($row['total_payment_amount'])) ?>)</span>
                                                 </li>
                                             <?php endif; endforeach; ?>
                                         </ul>
@@ -328,6 +332,7 @@ $payment_colors = [
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
+        <script src="theme.js"></script>
 </body>
 
 </html>

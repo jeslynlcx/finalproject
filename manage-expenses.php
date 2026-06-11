@@ -1,23 +1,29 @@
 <?php
 require('header.php');
+$user_id = $_SESSION['user']['id'];
 
-if(isset($_POST['id'])){
+if (isset($_POST['id'])) {
     $id = $_POST['id'];
-    $deleteQuery = "DELETE FROM expenses WHERE id=:id";
+    $deleteQuery = "DELETE FROM expenses WHERE id = :id AND user_id = :user_id";
     $stmt = $db->prepare($deleteQuery);
     $stmt->execute([
-        ":id"=>$id
+        ":id" => $id,
+        ":user_id" => $user_id
     ]);
+    
+    header("Location: manage-expenses.php");
+    exit();
 }
 
-$query = "SELECT expenses.*,categories.category_name, payments.payment_name FROM b18_finalproject.expenses
-LEFT JOIN categories
-ON expenses.category_id = categories.id
-LEFT JOIN payments
-ON expenses.payment_method_id = payments.id";
+$query = "SELECT expenses.*, categories.category_name, payments.payment_name 
+          FROM expenses
+          LEFT JOIN categories ON expenses.category_id = categories.id
+          LEFT JOIN payments ON expenses.payment_method_id = payments.id
+          WHERE expenses.user_id = :user_id
+          ORDER BY expenses.id DESC";
 
 $stmt = $db->prepare($query);
-$stmt->execute([]);
+$stmt->execute([":user_id" => $user_id]);
 $expenses = $stmt->fetchAll();
 ?>
 
@@ -36,6 +42,11 @@ $expenses = $stmt->fetchAll();
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" href="theme.css" />
+<script>
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
     <style type="text/css">
       body {
         background: #f1f1f1;
@@ -49,7 +60,7 @@ $expenses = $stmt->fetchAll();
   <body>
     <div class="container mx-auto my-5" style="max-width: 900px;">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1">Manage expense</h1>
+        <h1 class="h1 p-3 pb-0">Manage expense</h1>
       </div>
 
 
@@ -101,6 +112,7 @@ $expenses = $stmt->fetchAll();
           ><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
       </div>
     </div>
+    <script src="theme.js"></script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

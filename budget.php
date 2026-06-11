@@ -1,8 +1,31 @@
 <?php
 require('header.php');
+$user_id = $_SESSION['user']['id'];
 
-$user_id = 1;
+if (!isset($_SESSION['my_goals'][$user_id])) {
+    $_SESSION['my_goals'][$user_id] = [];
+}
+// Add Goals
+if (isset($_POST['add_goal'])) {
+    $_SESSION['my_goals'][] = [
+        'title' => $_POST['goalName'],
+        'target' => $_POST['goalTarget'],
+        'current' => $_POST['saved']
+    ];
+}
 
+// Edit Goals
+if (isset($_POST['edit_goal'])) {
+    $key = $_POST['goal_id'];
+    $_SESSION['my_goals'][$key]['current'] = $_POST['updated_current']; 
+}
+
+// Delete Goals
+if (isset($_POST['delete_goal'])) {
+    $key = $_POST['goal_id'];
+    unset($_SESSION['my_goals'][$key]);
+    $_SESSION['my_goals'] = array_values($_SESSION['my_goals']);
+}
 
 $categoryQuery = "SELECT 
                 categories.id AS category_id,
@@ -45,6 +68,12 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
     <title>Budget</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="theme.css" />
+    
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style type="text/css">
         body {
             background: #f1f1f1;
@@ -56,22 +85,26 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
             max-height: 210px;
             overflow-y: auto;
         }
-        .goals-scroll{
+        .scrollbar{
             max-height: 200px;
             overflow-y: auto;
             padding-right: 4px;
         }
         .title a {
             display: inline-block;
-            font-size: 25px;
+            font-size: 30px;
             text-decoration: none;
-            color: black !important;
+            color: black ;
             font-weight: bold;
             padding-left: 10px;
             margin-bottom: 15px;
         }
         .title a:hover {
-            color: #333 !important;
+            color: #333 ;
+        }
+        .card{
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+
         }
     </style>
 </head>
@@ -83,7 +116,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
         <div class="row g-3">
 
             <div class="col-md-6">
-                    <div class="card p-3 h-100 shadow-sm" style="border: none;">
+                    <div class="card p-3 h-100 " style="border: none;">
                         <h6 class="fw-bold mb-1">Limits by Category</h6>
                         <p class="text-muted small mb-2">Set monthly budget thresholds</p>
                         
@@ -101,7 +134,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="category_id" value="<?= $category_row['category_id'] ?>">
                                             <div class="input-group input-group-sm" style="max-width: 115px;">
                                                 <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $category_row['budget_limit'] ?>" required style="font-size: 0.75rem;">
-                                                <button type="button" class="btn btn-dark btn-sm btn-submit-cat">Set</button>
+                                                <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                             </div>
                                         </form>
                                     </div>
@@ -121,7 +154,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
             <div class="col-md-6">
-                <div class="card p-3 h-100 shadow-sm" style="border: none;">
+                <div class="card p-3 h-100" style="border: none;">
                     <h6 class="fw-bold mb-1">Limits by Payment</h6>
                     <p class="text-muted small mb-2">Monitor account-wide limits</p>
                     
@@ -139,7 +172,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="payment_id" value="<?= $payment_row['payment_id'] ?>">
                                             <div class="input-group input-group-sm" style="max-width: 115px;">
                                                 <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $payment_row['payment_limit'] ?>" required style="font-size: 0.75rem;">
-                                                <button type="button" class="btn btn-dark btn-sm btn-submit-pay">Set</button>
+                                                <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                             </div>
                                         </form>
                                     </div>
@@ -157,10 +190,120 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                 </div>
             </div>
-        </div> 
-    </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        </div> 
+
+        <div class="card p-3 my-3">
+            <h6 class="fw-bold mb-2">My Savings Goals</h6>
+
+            <form method="POST" class="row g-2 align-items-end mb-2 pb-2 border-bottom">
+                <div class="col-md-4">
+                    <input type="text" name="goalName" class="form-control form-control-sm" placeholder="Goal Name" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" step="0.01" name="goalTarget" class="form-control form-control-sm" placeholder="Target (RM)" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" step="0.01" name="saved" class="form-control form-control-sm" placeholder="Saved (RM)" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" name="add_goal" class="btn btn-sm btn-dark w-100">Add Goal</button>
+                </div>
+            </form>
+
+            <div class="scrollbar">
+                    <?php if (!empty($_SESSION['my_goals'])): ?>
+                        <?php foreach ($_SESSION['my_goals'] as $key => $goal): ?>
+                            <?php
+                            $percent = 0;
+                            if ($goal['target'] > 0) {
+                                $percent = ($goal['current'] / $goal['target']) * 100;
+                            }
+                            ?>
+                            <div class="row align-items-center py-2 border-bottom g-2 mx-0">
+                                <div class="col-sm-4 p-0">
+                                    <span class="fw-bold d-block text-truncate small"><?= $goal['title'] ?></span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Target: RM <?= $goal['target'] ?> (<?= (int)$percent ?>%)</small>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-success" style="width: <?= $percent ?>%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 p-0 d-flex align-items-center justify-content-end gap-2">
+                                    <form method="POST" class="d-flex align-items-center m-0 gap-1">
+                                        <input type="hidden" name="goal_id" value="<?= $key ?>">
+                                        <div class="input-group input-group-sm" style="max-width: 170px;">
+                                            <span class="input-group-text px-1" style="font-size: 0.7rem;">RM</span>
+                                            <input type="number" step="0.01" name="updated_current" class="form-control text-center" value="<?= $goal['current'] ?>" required style="font-size: 0.75rem;">
+                                            <button type="submit" name="edit_goal" class="btn btn-outline-secondary">Update</button>
+                                        </div>
+                                    </form>
+                                    <form method="POST" class="m-0">
+                                        <button type="submit" name="delete_goal" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        <input type="hidden" name="goal_id" value="<?= $key ?>">
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted small text-center my-2">No active savings goals found. Add one above!</p>
+                    <?php endif; ?>
+                </div>
+        </div>
+
+    </div>
     
+    <script src="theme.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $('.categoryBudgetForm').on('submit', function(event) {
+            event.preventDefault();
+            
+            // $(this)让那个'set'特定for那一行 //var $那个范围 = $(范围特定的一个区)
+            var $form = $(this); 
+            
+            $.ajax({
+                url: "http://localhost/finalproject/backend/index.php",
+                type: "POST",
+                data: {
+                    action: "editCategoryBudget",
+                    category_id: $form.find('input[name="category_id"]').val(), // $范围里.找('叫category_id的名.抽出来()
+                    amount: $form.find('.row-amount').val()
+                },
+                success: function(response){
+                    alert("Successfully Set Category Limit!");
+                    window.location.reload(); 
+                },
+                error: function(xhr, status, error){
+                    console.log("Error: ", error);
+                }
+            });
+        });
+
+        $('.paymentBudgetForm').on('submit', function(event) {
+            event.preventDefault();
+
+            var $form = $(this);
+            
+            $.ajax({
+                url: "http://localhost/finalproject/backend/index.php",
+                type: "POST",
+                data: {
+                    action: "editPaymentBudget",
+                    payment_id: $form.find('input[name="payment_id"]').val(),
+                    payment_amount: $form.find('.row-amount').val()
+                },
+                success: function(response){
+                    alert("Successfully Set Payment Limit!");
+                    window.location.reload(); 
+                },
+                error: function(xhr, status, error){
+                    console.log("Error: ", error);
+                }
+            });
+        });
+</script>   
 </body>
 </html>
