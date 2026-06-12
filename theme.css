@@ -1,0 +1,114 @@
+:root {
+    --bg-color: #f1f1f1;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c7a8f;
+    --border-color: #dee2e6;
+    --navbar-brand: #212529;
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --progress-bg: #e9ecef;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121725;
+    --card-bg: #1e293b;
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #566f92;
+    --navbar-brand: #38bdf8;
+    --input-bg: #0f172a;
+    --input-border: #475569;
+    --progress-bg: #334155;
+}
+
+body {
+    background-color: var(--bg-color) !important; /*背背背背景*/ 
+}
+
+.card {
+    background-color: var(--card-bg) !important; /*背景*/
+    color: var(--text-color) !important; /*Total expenses的字*/
+    border: 1px solid var(--border-color) !important; /*蓝框框*/
+}
+
+.table {
+    color: var(--text-color) !important; /*title和amount的字*/
+}
+
+#themeToggle, .title a {
+    color: var(--navbar-brand) !important; /*Limit and goals word*/
+    cursor: pointer;
+}
+#themeToggle:hover, .title a:hover {
+    opacity: 0.8; /*Limit and goals word 会有变暗动画*/
+}
+
+.profile-logo {
+    border-color: var(--text-color) !important; 
+    color: var(--text-color) !important;
+}
+
+.form-control, .input-group-text { /*budget page的*/
+    background-color: var(--input-bg) !important; /*input格子颜色*/
+    color: var(--text-color) !important; /*input里面的字*/
+    border-color: var(--input-border) !important; /*input框框*/
+}
+.form-control::placeholder {
+    color: var(--text-muted) !important; /*Goals placeholder里面的字*/
+}
+
+.list-group-item {
+    color: var(--text-color) !important; /*piechart category name*/
+}
+
+.text-black, .text-dark, .fw-bold {
+    color: var(--text-color) !important; /*Expenses view more 和 by category by payment*/
+}
+.text-muted {
+    color: var(--text-muted) !important; /*'Analytic' word and the %*/
+}
+.expenses-table {
+    color: var(--text-muted) !important; /*expenses title 下面的字*/
+}
+.btn-outline-secondary {
+    color: var(--text-color) !important; /*piechart 箭头*/
+}
+.btn-dark {
+    background: #324147 !important; /*budget set button*/
+    color: #ffffff !important; /*set word*/
+    font-weight: 600 !important;
+}
+
+.btn-outline-danger {
+    color: #f87171 !important; /*delete button 颜色*/
+}
+.btn-outline-danger:hover {
+    background: rgba(248, 113, 113, 0.1) !important;  /*delete button mouse 的效果*/
+}
+
+.progress-bar.bg-danger {
+    background: #ff4242 !important;
+}
+
+.progress-bar.bg-success {
+    background:  #24da67 !important;
+}
+
+.form-control,.form-select, textarea, select,.input-group-text {
+    background-color: var(--input-bg) !important; /*Add expenses 里面的 input格子*/
+    color: var(--text-color) !important; /*input里面字*/
+    border: 1px solid var(--input-border) !important; /*跟着蓝框原本白框*/
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2bbaf7 !important; /* input蓝蓝框亮亮*/
+}
+
+.text-center a.text-black:hover {
+    color: #38bdf8 !important; /*Back to dashboard颜色*/
+}
+
+.text-black, .text-dark, .fw-bold, h1, h2, h3, h4, .h1 {
+    color: var(--text-color) !important; 
+}

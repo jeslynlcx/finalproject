@@ -88,7 +88,7 @@ $displayAmount = isset($expenses['amount']) ? ($expenses['amount']) : '';
                   <option value="4" <?= (($expenses['category_id'] ?? 0) === 4) ? 'selected' : '' ?>>Education</option>
                   <option value="5" <?= (($expenses['category_id'] ?? 0) === 5) ? 'selected' : '' ?>>Investment</option>
                   <option value="6" <?= (($expenses['category_id'] ?? 0) === 6) ? 'selected' : '' ?>>Utility</option>
-                  <option value="7" <?= (($expenses['category_id'] ?? 0) === 7) ? 'selected' : '' ?>>Income</option>
+                  <option value="7" <?= (($expenses['category_id'] ?? 0) === 7) ? 'selected' : '' ?>>Shopping</option>
                   <option value="8" <?= (($expenses['category_id'] ?? 0) === 8) ? 'selected' : '' ?>>Other</option>
                 </select>
             </div>

@@ -1,13 +1,13 @@
 <?php
 require('header.php');
 $user_id = $_SESSION['user']['id'];
-
 if (!isset($_SESSION['my_goals'][$user_id])) {
     $_SESSION['my_goals'][$user_id] = [];
 }
+
 // Add Goals
 if (isset($_POST['add_goal'])) {
-    $_SESSION['my_goals'][] = [
+    $_SESSION['my_goals'][$user_id][] = [
         'title' => $_POST['goalName'],
         'target' => $_POST['goalTarget'],
         'current' => $_POST['saved']
@@ -17,15 +17,22 @@ if (isset($_POST['add_goal'])) {
 // Edit Goals
 if (isset($_POST['edit_goal'])) {
     $key = $_POST['goal_id'];
-    $_SESSION['my_goals'][$key]['current'] = $_POST['updated_current']; 
+    $_SESSION['my_goals'][$user_id][$key]['current'] = $_POST['updated_current']; 
 }
 
 // Delete Goals
 if (isset($_POST['delete_goal'])) {
     $key = $_POST['goal_id'];
-    unset($_SESSION['my_goals'][$key]);
-    $_SESSION['my_goals'] = array_values($_SESSION['my_goals']);
+    unset($_SESSION['my_goals'][$user_id][$key]);
+    
+    if (is_array($_SESSION['my_goals'][$user_id])) {
+        $_SESSION['my_goals'][$user_id] = array_values($_SESSION['my_goals'][$user_id]);
+    } else {
+        $_SESSION['my_goals'][$user_id] = [];
+    }
 }
+
+$user_goals = $_SESSION['my_goals'][$user_id];
 
 $categoryQuery = "SELECT 
                 categories.id AS category_id,
@@ -113,86 +120,90 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
         <div class="title a">
             <a href="index.php">Limits and Goals</a>
         </div>
-        <div class="row g-3">
 
+<!--Limit by Category------------------>
+    <div class="row g-3">
             <div class="col-md-6">
-                    <div class="card p-3 h-100 " style="border: none;">
-                        <h6 class="fw-bold mb-1">Limits by Category</h6>
-                        <p class="text-muted small mb-2">Set monthly budget thresholds</p>
-                        
-                        <div class="tableno">
-                            <?php foreach ($results as $category_row): ?>
-                                <div class="row align-items-center py-2 border-bottom g-2 mx-0">
-                                    <div class="col-6 p-0">
-                                        <span class="fw-bold d-block text-truncate small"><?= $category_row['category_name'] ?></span>
-                                        <span class="text-muted" style="font-size: 0.75rem;">
-                                            RM <?= $category_row['total_category_amount'] ?> / <?= $category_row['budget_limit'] ?>
-                                        </span>
-                                    </div>
-                                    <div class="col-6 p-0">
-                                        <form method="POST" class="categoryBudgetForm d-flex justify-content-end align-items-center m-0">
-                                            <input type="hidden" name="category_id" value="<?= $category_row['category_id'] ?>">
-                                            <div class="input-group input-group-sm" style="max-width: 115px;">
-                                                <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $category_row['budget_limit'] ?>" required style="font-size: 0.75rem;">
-                                                <button type="submit" class="btn btn-dark btn-sm">Set</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-12 p-0 mt-1">
-                                        <div class="progress overflow-hidden" style="height: 5px;">
-                                            <?php 
-                                            $percent = ($category_row['total_category_amount'] / $category_row['budget_limit']) * 100; 
-                                            ?>
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
-
+                <div class="card p-3 h-100 " style="border: none;">
+                    <h6 class="fw-bold mb-1">Limits by Category</h6>
+                    <p class="text-muted small mb-2">Set monthly budget thresholds</p>
+                    
+                    <div class="tableno">
+                        <?php foreach ($results as $category_row): ?>
+                            <div class="row align-items-center py-2 border-bottom g-2 mx-0">
+                                <div class="col-6 p-0">
+                                    <span class="fw-bold d-block text-truncate small"><?= $category_row['category_name'] ?></span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">
+                                        RM <?= $category_row['total_category_amount'] ?> / <?= $category_row['budget_limit'] ?>
+                                    </span>
+                                </div>
+                                <div class="col-6 p-0">
+                                    <form method="POST" class="categoryBudgetForm d-flex justify-content-end align-items-center m-0">
+                                        <input type="hidden" name="category_id" value="<?= $category_row['category_id'] ?>">
+                                        <div class="input-group input-group-sm" style="max-width: 115px;">
+                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $category_row['budget_limit'] ?>" required style="font-size: 0.75rem;">
+                                            <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                         </div>
+                                    </form>
+                                </div>
+                                <div class="col-12 p-0 mt-1">
+                                    <div class="progress overflow-hidden" style="height: 5px;">
+                                        <?php 
+                                        $percent = ($category_row['total_category_amount'] / $category_row['budget_limit']) * 100; 
+                                        ?>
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
+
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
+                    
                 </div>
-
+            </div>
+<!--Limit by Category------------------>
+<!--Limit by Payment------------------>
             <div class="col-md-6">
                 <div class="card p-3 h-100" style="border: none;">
                     <h6 class="fw-bold mb-1">Limits by Payment</h6>
                     <p class="text-muted small mb-2">Monitor account-wide limits</p>
                     
                     <div class="tableno">
-                            <?php foreach ($payment_results as $payment_row): ?>
-                                <div class="row align-items-center py-2 border-bottom g-2 mx-0">
-                                    <div class="col-6 p-0">
-                                        <span class="fw-bold d-block text-truncate small"><?= $payment_row['payment_name'] ?></span>
-                                        <span class="text-muted" style="font-size: 0.75rem;">
-                                            RM <?= $payment_row['total_payment_amount'] ?> / <?= $payment_row['payment_limit'] ?>
-                                        </span>
-                                    </div>
-                                    <div class="col-6 p-0">
-                                        <form method="POST" class="paymentBudgetForm d-flex justify-content-end align-items-center m-0">
-                                            <input type="hidden" name="payment_id" value="<?= $payment_row['payment_id'] ?>">
-                                            <div class="input-group input-group-sm" style="max-width: 115px;">
-                                                <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $payment_row['payment_limit'] ?>" required style="font-size: 0.75rem;">
-                                                <button type="submit" class="btn btn-dark btn-sm">Set</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-12 p-0 mt-1">
-                                        <div class="progress overflow-hidden" style="height: 5px;">
-                                            <?php 
-                                            $percent = ($payment_row['total_payment_amount'] / $payment_row['payment_limit']) * 100; 
-                                            ?>
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
-
+                        <?php foreach ($payment_results as $payment_row): ?>
+                            <div class="row align-items-center py-2 border-bottom g-2 mx-0">
+                                <div class="col-6 p-0">
+                                    <span class="fw-bold d-block text-truncate small"><?= $payment_row['payment_name'] ?></span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">
+                                        RM <?= $payment_row['total_payment_amount'] ?> / <?= $payment_row['payment_limit'] ?>
+                                    </span>
+                                </div>
+                                <div class="col-6 p-0">
+                                    <form method="POST" class="paymentBudgetForm d-flex justify-content-end align-items-center m-0">
+                                        <input type="hidden" name="payment_id" value="<?= $payment_row['payment_id'] ?>">
+                                        <div class="input-group input-group-sm" style="max-width: 115px;">
+                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $payment_row['payment_limit'] ?>" required style="font-size: 0.75rem;">
+                                            <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                         </div>
+                                    </form>
+                                </div>
+                                <div class="col-12 p-0 mt-1">
+                                    <div class="progress overflow-hidden" style="height: 5px;">
+                                        <?php 
+                                        $percent = ($payment_row['total_payment_amount'] / $payment_row['payment_limit']) * 100; 
+                                        ?>
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
+
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+
             </div>
-
-        </div> 
-
+    </div> <!--div class="row g-3"-->
+<!--Limit by Payment------------------>
+<!--Goals-->
         <div class="card p-3 my-3">
             <h6 class="fw-bold mb-2">My Savings Goals</h6>
 
@@ -212,14 +223,14 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
             </form>
 
             <div class="scrollbar">
-                    <?php if (!empty($_SESSION['my_goals'])): ?>
-                        <?php foreach ($_SESSION['my_goals'] as $key => $goal): ?>
-                            <?php
+                    <?php if (!empty($user_goals) && is_array($user_goals)): ?>
+                    <?php foreach ($user_goals as $key => $goal): ?>
+                        <?php if (!is_array($goal)) { continue; } 
                             $percent = 0;
-                            if ($goal['target'] > 0) {
-                                $percent = ($goal['current'] / $goal['target']) * 100;
-                            }
-                            ?>
+                        if (isset($goal['target']) && $goal['target'] > 0) {
+                            $percent = ($goal['current'] / $goal['target']) * 100;
+                        }
+                        ?>
                             <div class="row align-items-center py-2 border-bottom g-2 mx-0">
                                 <div class="col-sm-4 p-0">
                                     <span class="fw-bold d-block text-truncate small"><?= $goal['title'] ?></span>
@@ -248,12 +259,13 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-muted small text-center my-2">No active savings goals found. Add one above!</p>
-                    <?php endif; ?>
-                </div>
-        </div>
+                    <?php endif; ?> <!--if (!empty($user_goals) && is_array($user_goals)):-->
+            </div>
+        </div> <!--div class="card p-3 my-3"-->
 
-    </div>
-    
+    </div> <!--div class="container py-4 dashboard"-->
+<!--Goals-->
+
     <script src="theme.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

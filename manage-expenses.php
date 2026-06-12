@@ -37,7 +37,7 @@ $expenses = $stmt->fetchAll();
       rel="stylesheet"
       integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
       crossorigin="anonymous"
-    />
+      />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
@@ -51,16 +51,38 @@ $expenses = $stmt->fetchAll();
       body {
         background: #f1f1f1;
       }
-      .transaction-meta {
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
+      .popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6); 
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s ease;
+      }
+      .popup-card{
+          background: #fff;
+          padding: 25px;
+          border-radius: 15px;
+          width: 100%;
+          max-width: 450px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+      .popup-overlay:target {
+          opacity: 1;
+          pointer-events: auto;
+      }
     </style>
   </head>
   <body>
-    <div class="container mx-auto my-5" style="max-width: 900px;">
+    <div class="container mx-auto my-3" style="max-width: 900px;">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1 p-3 pb-0">Manage expense</h1>
+        <h1 class="h1 p-3 pb-0 pt-0">Manage expense</h1>
       </div>
 
 
@@ -85,35 +107,45 @@ $expenses = $stmt->fetchAll();
                 <td><?= $expense['category_name']?></td> 
                 <td><?= $expense['payment_name']?></td> 
                 <td><?= $expense['expense_date']?></td> 
-                <td class="text-end">
-                  <div class="buttons">
-                    <a
-                      href="post.php?id=<?=$expense['id']?>"
-                      target="_self"
-                      class="btn btn-primary btn-sm me-2"
-                      ><i class="bi bi-eye"></i></a>
-                    <a href="manage-expenses-edit.php?id=<?=$expense['id']?>"
-                      class="btn btn-secondary btn-sm me-2"><i class="bi bi-pencil"></i></a>
+                    <td class="text-end">
+                      <a href="#viewModal<?= $expense['id'] ?>" class="btn btn-primary btn-sm me-2"><i class="bi bi-eye"></i></a>
+
+                      <div id="viewModal<?= $expense['id'] ?>" class="popup-overlay">
+                        <div class="popup-card text-start" style="color: #333;">
+                          
+                          <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                            <span class="fw-bold text-primary"><i class="bi bi-eye"></i> Details</span>
+                            <a href="#" class="btn-close text-decoration-none" aria-label="Close"></a>
+                          </div>
+                          
+                          <div style="font-size: 15px;">
+                            <p class="mb-1"><strong>Title:</strong> <?= ($expense['title']) ?></p>
+                            <p class="mb-1"><strong>Description:</strong> <?= ($expense['description']) ?></p>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <a href="manage-expenses-edit.php?id=<?=$expense['id']?>" class="btn btn-secondary btn-sm me-2"><i class="bi bi-pencil"></i></a>
                       <form method="POST" class="d-inline">
-                    <button class="btn btn-danger btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
-                    <input type="hidden" name="id" value="<?= $expense['id']?>">
-                    </form>
-                  </div>
-                </td>
+                        <button class="btn btn-danger btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
+                        <input type="hidden" name="id" value="<?= $expense['id']?>">
+                      </form>
+                      </div>
+                    </td>
               </tr>
-            </div>
+              </div>
             <?php endforeach; ?>
           </tbody>
         </table>
       </div>
   
       <div class="text-center">
-        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"
-          ><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
+        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
       </div>
     </div>
-    <script src="theme.js"></script>
 
+    <script src="theme.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"

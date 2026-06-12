@@ -18,6 +18,11 @@ $user = json_decode($user, true);
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" href="theme.css" />
+    <script>
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style type="text/css">
       body {
         background: #f1f1f1;
@@ -36,11 +41,11 @@ $user = json_decode($user, true);
             <div class="row">
               <div class="col">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="<?= $user['name']?>" required/>
+                <input type="text" class="form-control" id="name" name="name" value="<?= ($user['name'] ?? '')?>" required/>
               </div>
               <div class="col">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?= $user['email']?>" />
+                <input type="email" class="form-control" id="email" name="email" value="<?= ($user['email'] ?? '')?>" />
               </div>
             </div>
           </div>
@@ -48,8 +53,8 @@ $user = json_decode($user, true);
             <label for="role" class="form-label">Role</label>
             <select class="form-control" id="role" name="role" required>
               <option value="">Select an option</option>
-              <option value="user"<?= $user['role'] == 'user' ?'selected' :  ''?>>User</option>
-              <option value="admin"<?= $user['role'] == 'admin' ?'selected' : ''?>>Admin</option>
+              <option value="user"<?= ($user['role'] ?? '') == 'user' ?'selected' :  ''?>>User</option>
+              <option value="admin"<?= ($user['role'] ?? '') == 'admin' ?'selected' : ''?>>Admin</option>
             </select>
           </div>
           <input type="hidden" name="id" value="<?= $user['id']?>">
@@ -65,6 +70,7 @@ $user = json_decode($user, true);
         >
       </div>
     </div>
+    <script src="theme.js"></script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

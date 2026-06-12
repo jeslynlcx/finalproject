@@ -13,7 +13,7 @@ $stmt->execute(array(
     ':name'=>$name,
     ':email'=>$email,
     ':password'=>password_hash($password, PASSWORD_BCRYPT),
-    ':role'=>2
+    ':role'=>'user'
 ));
 
 

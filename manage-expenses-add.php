@@ -78,7 +78,7 @@ require('header.php');
             <option value="4">Education</option>
             <option value="5">Investment</option>
             <option value="6">Utility</option>
-            <option value="7">Income</option>
+            <option value="7">Shopping</option>
             <option value="8">Other</option>
           </select>
           </div>

@@ -12,6 +12,11 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" href="theme.css" />
+    <script>
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style type="text/css">
       body {
         background: #f1f1f1;
@@ -73,6 +78,7 @@
         ></a>
       </div>
     </div>
+    <script src="theme.js"></script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

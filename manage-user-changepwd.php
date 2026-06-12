@@ -1,114 +1,120 @@
-<?php
-require("header.php");
+  <?php
+  require("header.php");
 
-if(!isset($_GET['id'])){
-    header("Location: manage-user.php");
-    exit;
-}
-$id = $_GET['id'];
-?>
+  if(!isset($_GET['id'])){
+      header("Location: manage-user.php");
+      exit;
+  }
+  $id = $_GET['id'];
+  ?>
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Simple CMS</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
-    />
-    <style type="text/css">
-      body {
-        background: #f1f1f1;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container mx-auto my-5" style="max-width: 700px;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1">Change Password</h1>
-      </div>
-      <div class="card mb-2 p-4">
-        <form method="POST" id="changePwdForm">
-          <div class="mb-3">
-            <div class="row">
-              <div class="col">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required/>
-              </div>
-              <input type="hidden" name="id" value="<?= $id ?>">
-              <div class="col">
-                <label for="confirm_password" class="form-label"
-                  >Confirm Password</label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  id="confirm_password"
-                  name="confirm_password"
-                  required
-                />
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Finalproject</title>
+      <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+        crossorigin="anonymous"
+      />
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+      />
+      <link rel="stylesheet" href="theme.css" />
+    <script>
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+      <style type="text/css">
+        body {
+          background: #f1f1f1;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container mx-auto my-5" style="max-width: 700px;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h1 class="h1">Change Password</h1>
+        </div>
+        <div class="card mb-2 p-4">
+          <form method="POST" id="changePwdForm">
+            <div class="mb-3">
+              <div class="row">
+                <div class="col">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" required/>
+                </div>
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <div class="col">
+                  <label for="confirm_password" class="form-label"
+                    >Confirm Password</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="confirm_password"
+                    name="confirm_password"
+                    required
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary">
-              Change Password
-            </button>
-          </div>
-        </form>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                Change Password
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="text-center">
+          <a href="manage-user.php" class="btn btn-link btn-sm"
+            ><i class="bi bi-arrow-left"></i> Back to Users</a
+          >
+        </div>
       </div>
-      <div class="text-center">
-        <a href="manage-user.php" class="btn btn-link btn-sm"
-          ><i class="bi bi-arrow-left"></i> Back to Users</a
-        >
-      </div>
-    </div>
+    <script src="theme.js"></script>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-      crossorigin="anonymous"
-    ></script>
-     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-      $('#changePwdForm').on('submit', (function(event){
-          event.preventDefault();
-          console.log("Form submitted");
-          let password = $('#password').val();
-          let confirm_password = $('#confirm_password').val();
-          if(password == confirm_password){
-          $.ajax({
-            url: "http://localhost/cms/backend/index.php",
-            type: "POST", 
-            data: {
-              action: "changePassword",
-              password: password,
-              confirm_password: confirmPassword,
-              id: <?= $id ?>
-            },
-            success: function(response){
-                console.log(response);
-                alert("Successfully Changed Password!")
-                window.location.href = "http://localhost/cms/manage-user.php";
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"
+      ></script>
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+      <script>
+        $('#changePwdForm').on('submit', (function(event){
+            event.preventDefault();
+            console.log("Form submitted");
+            let password = $('#password').val();
+            let confirm_password = $('#confirm_password').val();
+            if(password == confirm_password){
+            $.ajax({
+              url: "http://localhost/finalproject/backend/index.php",
+              type: "POST", 
+              data: {
+                action: "changePassword",
+                password: password,
+                confirm_password: confirm_password,
+                id: <?= $id ?>
+              },
+              success: function(response){
+                  console.log(response);
+                  alert("Successfully Changed Password!")
+                  window.location.href = "http://localhost/finalproject/manage-user.php";
 
-            },
-            error: function(xhr, status, error){
-                console.log("Error: ", error)
-                console.log("Error: ", xhr)
-                console.log("Error: ", error)
-            }
-          })
-        }else{ 
-          alert("Password and Confirm Password must match!");
-        }
-      }))
-    </script>
-  </body>
-</html>
+              },
+              error: function(xhr, status, error){
+                  console.log("Error: ", error)
+                  console.log("Error: ", xhr)
+                  console.log("Error: ", error)
+              }
+            })
+          }else{ 
+            alert("Password and Confirm Password must match!");
+          }
+        }))
+      </script>
+    </body>
+  </html>
