@@ -1,12 +1,9 @@
 <?php
 require('header.php');
-$id = isset($_GET['id']) ? ($_GET['id']) : 0;
-
-$stmt = $db->prepare("SELECT * FROM expenses WHERE id = :id");
-$stmt->execute([':id' => $id]);
-$expenses = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
-$displayAmount = isset($expenses['amount']) ? ($expenses['amount']) : '';
+$id = $_GET['id'];
+$user_id = $_SESSION['user']['id'];
+$expense = file_get_contents("http://localhost/finalproject/backend/index.php?action=getOneExpense&id=$id&user_id=$user_id");
+$expense = json_decode($expense, true);
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,12 +26,6 @@ $displayAmount = isset($expenses['amount']) ? ($expenses['amount']) : '';
     </script>
     <style type="text/css">
       body { background: #f1f1f1; }
-      .form-control, .form-select {
-        border-radius: 20px;
-        background-color: #f8f9fa5e;
-        border-color: #4f8cff;
-        box-shadow: 0 0 0 3px rgba(79,140,255,.15);
-      }
       .form-label {
         padding-left: 10px;
         margin-bottom: 0px;
@@ -47,60 +38,59 @@ $displayAmount = isset($expenses['amount']) ? ($expenses['amount']) : '';
   <body>
     <div class="container mx-auto my-5" style="max-width: 700px;">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1 p-3 pb-0">Edit Expenses</h1>
+        <h1 class="h1 p-3 pb-0 fs-3 fw-bold">Edit Expenses</h1>
       </div>
         <div class="card mb-2 p-4">
             <form method="POST" id='editExpenseForm'>
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" value="<?= ($expenses['title'] ?? '') ?>" required />
+                <input type="text" class="form-control" id="title" name="title" value="<?= ($expense['title'] ?? '') ?>" required />
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="description" name="description" value="<?= ($expenses['description'] ?? '') ?>" />
+                <input type="text" class="form-control" id="description" name="description" value="<?= ($expense['description'] ?? '') ?>" />
             </div>
             <div class="mb-3">
                 <label for="amount" class="form-label">Amount</label>
-                <input type="text" class="form-control amount" id="amount" name="amount" value="<?= ($displayAmount) ?>" required/>
+                <input type="text" class="form-control amount" id="amount" name="amount" value="<?= ($expense['amount'] ?? '')?>" required/>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="payment_method_id" class="form-label">Payment Method</label>
                 <select name="payment_method_id" id="payment_method_id" class="form-select">
                   <option value="">Select an option</option>
-                  <option value="1" <?= (($expenses['payment_method_id'] ?? 0) === 1) ? 'selected' : '' ?>>Cash</option>
-                  <option value="2" <?= (($expenses['payment_method_id'] ?? 0) === 2) ? 'selected' : '' ?>>Credit Card</option>
-                  <option value="3" <?= (($expenses['payment_method_id'] ?? 0) === 3) ? 'selected' : '' ?>>Touch & Go</option>
+                  <option value="1" <?= (($expense['payment_method_id'] ?? 0) === 1) ? 'selected' : '' ?>>Cash</option>
+                  <option value="2" <?= (($expense['payment_method_id'] ?? 0) === 2) ? 'selected' : '' ?>>Credit Card</option>
+                  <option value="3" <?= (($expense['payment_method_id'] ?? 0) === 3) ? 'selected' : '' ?>>Touch & Go</option>
                 </select>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="expense_date" class="form-label">Date</label>
-                <input type="date" class="form-control date" id="expense_date" name="expense_date" value="<?= ($expenses['expense_date'] ?? '') ?>">
+                <input type="date" class="form-control date" id="expense_date" name="expense_date" value="<?= ($expense['expense_date'] ?? '') ?>">
               </div>
             </div>
             <div class="mb-3 ">
                 <label for="category_id" class="form-label">All Category</label>
                 <select name="category_id" id="category_id" class="form-select">
                   <option value="">Select an option</option>
-                  <option value="1" <?= (($expenses['category_id'] ?? 0) === 1) ? 'selected' : '' ?>>Food</option>
-                  <option value="2" <?= (($expenses['category_id'] ?? 0) === 2) ? 'selected' : '' ?>>Transport</option>
-                  <option value="3" <?= (($expenses['category_id'] ?? 0) === 3) ? 'selected' : '' ?>>Entertainment</option>
-                  <option value="4" <?= (($expenses['category_id'] ?? 0) === 4) ? 'selected' : '' ?>>Education</option>
-                  <option value="5" <?= (($expenses['category_id'] ?? 0) === 5) ? 'selected' : '' ?>>Investment</option>
-                  <option value="6" <?= (($expenses['category_id'] ?? 0) === 6) ? 'selected' : '' ?>>Utility</option>
-                  <option value="7" <?= (($expenses['category_id'] ?? 0) === 7) ? 'selected' : '' ?>>Shopping</option>
-                  <option value="8" <?= (($expenses['category_id'] ?? 0) === 8) ? 'selected' : '' ?>>Other</option>
+                  <option value="1" <?= (($expense['category_id'] ?? 0) === 1) ? 'selected' : '' ?>>Food</option>  <!--??Get category_id or use 0, === 1 Check if it is Food, ? : If yes → "selected", no → ""-->
+                  <option value="2" <?= (($expense['category_id'] ?? 0) === 2) ? 'selected' : '' ?>>Transport</option>
+                  <option value="3" <?= (($expense['category_id'] ?? 0) === 3) ? 'selected' : '' ?>>Entertainment</option>
+                  <option value="4" <?= (($expense['category_id'] ?? 0) === 4) ? 'selected' : '' ?>>Education</option>
+                  <option value="5" <?= (($expense['category_id'] ?? 0) === 5) ? 'selected' : '' ?>>Investment</option>
+                  <option value="6" <?= (($expense['category_id'] ?? 0) === 6) ? 'selected' : '' ?>>Utility</option>
+                  <option value="7" <?= (($expense['category_id'] ?? 0) === 7) ? 'selected' : '' ?>>Shopping</option>
+                  <option value="8" <?= (($expense['category_id'] ?? 0) === 8) ? 'selected' : '' ?>>Other</option>
                 </select>
             </div>
             <div class="text-end">
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" class="btn btn-dark">Update</button>
             </div>
             </form>
         </div>
       
       <div class="text-center">
-        <a href="manage-expenses.php" class="btn-sm text-black fw-bold text-decoration-none"
-          ><i class="bi bi-arrow-left-circle"></i> Back to All</a>
+        <a href="manage-expenses.php" class="btn-sm text-black fw-bold text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Back to All</a>
       </div>
     </div>
     <script src="theme.js"></script>

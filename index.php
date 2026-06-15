@@ -7,36 +7,16 @@ $stmtExpense = $db->prepare($expenseQuery);
 $stmtExpense->execute([':user_id' => $user_id]);
 $totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
 
-$query = "SELECT 
-            expenses.*, 
-            categories.category_name, 
-            payments.payment_name 
-          FROM expenses
-          LEFT JOIN categories ON expenses.category_id = categories.id
-          LEFT JOIN payments ON expenses.payment_method_id = payments.id
-          WHERE expenses.user_id = :user_id
-          ORDER BY expenses.id DESC";
-
-$stmt = $db->prepare($query);
-$stmt->execute([':user_id' => $user_id]); 
-$expenses = $stmt->fetchAll();
+$expenses = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getAllExpenses&user_id=$user_id");
+$expenses = json_decode($expenses, true);
 
 $totalRowStmt = $db->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id = :user_id");
 $totalRowStmt->execute([':user_id' => $user_id]);
 $totalRow = $totalRowStmt->fetch(PDO::FETCH_ASSOC);
 $total = $totalRow['total'] ? ($totalRow['total']) : 1; 
 
-$resultsStmt = $db->prepare("SELECT 
-                        expenses.category_id,
-                        categories.category_name, 
-                        SUM(expenses.amount) as total_category_amount
-                       FROM expenses 
-                       LEFT JOIN categories ON expenses.category_id = categories.id 
-                       WHERE expenses.user_id = :user_id
-                       GROUP BY expenses.category_id, categories.category_name");
-$resultsStmt->execute([':user_id' => $user_id]);
-$results = $resultsStmt->fetchAll(PDO::FETCH_ASSOC);
-
+$category_results = file_get_contents("http://localhost/finalproject/backend/index.php?action=getCategorySum&user_id=$user_id");
+$category_results = json_decode($category_results, true);
 $colors = [
     1 => '#BCD2E8',
     2 => '#91BAD6',
@@ -48,17 +28,8 @@ $colors = [
     8 => '#0d1d31'
 ];
 
-$paymentResultsStmt = $db->prepare("SELECT 
-                        expenses.payment_method_id,
-                        payments.payment_name, 
-                        SUM(expenses.amount) as total_payment_amount
-                       FROM expenses
-                       LEFT JOIN payments ON expenses.payment_method_id = payments.id
-                       WHERE expenses.user_id = :user_id
-                       GROUP BY expenses.payment_method_id, payments.payment_name");
-$paymentResultsStmt->execute([':user_id' => $user_id]);
-$payment_results = $paymentResultsStmt->fetchAll(PDO::FETCH_ASSOC);
-
+$payment_results = file_get_contents("http://localhost/finalproject/backend/index.php?action=getPaymentSum&user_id=$user_id");
+$payment_results = json_decode($payment_results, true);
 $payment_colors = [
     1 => '#BCD2E8',
     2 => '#91BAD6',
@@ -87,10 +58,6 @@ $payment_colors = [
         body {
             background: #f1f1f1;
         }
-        .profile-logo{
-            border: 1px black solid;
-            border-radius: 50%;
-        }
         .expenses-table{
             font-size: 0.75rem;
             color: #6c7a8f;
@@ -109,14 +76,13 @@ $payment_colors = [
             margin: 0 auto; 
         }
         .profile-logo {
-            border: 1px #020c13 solid;
+            border: 1px #000000 solid;
             border-radius: 50%;
             padding: 1px 4px;
         }
         .card{
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
-        
     </style>
 </head>
 
@@ -125,7 +91,7 @@ $payment_colors = [
     <div class="container-fluid py-3">
     <div class="mx-auto dashboard">
         <nav class="navbar navbar-expand-lg pb-0">            
-            <span id="themeToggle" class="fw-bold fs-3 p-2">Money Manager</span>
+            <span id="themeToggle" class="fw-bold fs-3 p-2">Money Manager  <i class="bi bi-toggle-on"></i></span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -150,15 +116,14 @@ $payment_colors = [
                     <?php endif; ?>
                 </ul>
             </div>
-        </nav>
-    
+        </nav>  
 <!-- NAVBARRRRRR------------------>
 <!-- Total Datassss------------------------------ -->
         <div class="row justify-content-start justify-content-around pb-4 mt-0">
             <div class="row col-12">
                 <div class="card">
                     <div class="card-body">
-                        <p>Total Expenses</p>
+                        <p class="fw-bold">Total Expenses</p>
                         <h2 class="fs-1 fw-bold">RM<?= ($totalExpenses) ?></h2>                
                     </div>
                 </div>
@@ -230,27 +195,27 @@ $payment_colors = [
                                         <div class="text-center">
                                             <div class="pie mx-auto mb-3" style="background: conic-gradient(
                                                 <?php 
-                                                $accumulated = 0;
-                                                foreach ($results as $row) {
-                                                    $percent = (($row['total_category_amount']) / $total) * 100;
-                                                    if ($percent > 0) {
-                                                        $accumulated += $percent;
-                                                        echo $colors[$row['category_id']] . " 0 " . $accumulated . "%,";
+                                                $accumulated = 0; /*从0开始累计*/ 
+                                                foreach ($category_results as $row) {
+                                                    $percent = (($row['total_category_amount']) / $total) * 100; /*（那个category总共÷全部category的总共）×100=多少%*/
+                                                    if ($percent > 0) { 
+                                                        $accumulated += $percent; /*跟着%增加调整颜色停哪里*/ 
+                                                        echo $colors[$row['category_id']] . " 0 " . $accumulated . "%,"; /*output the color part according the category color have set 补充多少%的圆格*/
                                                     }
                                                 }
                                                 ?> #e2e8f0 0);">
                                             </div>
                                             
                                             <ul class="list-group list-group-flush">
-                                                <?php foreach ($results as $row): 
-                                                    $percent = round((($row['total_category_amount']) / $total) * 100);
-                                                    if ($percent > 0): ?>
+                                                <?php foreach ($category_results as $row): 
+                                                    $percent = round((($row['total_category_amount']) / $total) * 100); /*round of decimal number*/
+                                                    if ($percent > 0): ?> <!--Only show categories that have spending-->
                                                     <li class="list-group-item d-flex justify-content-between align-items-center p-0" style="border:none; background:transparent;">
                                                         <div>
                                                             <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $colors[$row['category_id']] ?>;"></span>
                                                             <strong><?= $row['category_name'] ?></strong>
                                                         </div>
-                                                        <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= number_format(($row['total_category_amount']), 2) ?>)</span>
+                                                        <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= ($row['total_category_amount']) ?>)</span>
                                                     </li>
                                                 <?php endif; endforeach; ?>
                                             </ul>
@@ -283,12 +248,12 @@ $payment_colors = [
                                         <div class="text-center">
                                             <div class="pie mx-auto mb-3" style="background: conic-gradient(
                                                 <?php 
-                                                $accumulated_pay = 0;
+                                                $accumulated_payment = 0; /*从0开始累计*/ 
                                                 foreach ($payment_results as $row) {
-                                                    $percent = (($row['total_payment_amount']) / $total) * 100;
-                                                    if ($percent > 0) {
-                                                        $accumulated_pay += $percent;
-                                                        echo ($payment_colors[$row['payment_method_id']] ?? '#6c7a8f') . " 0 " . $accumulated_pay . "%,";
+                                                    $percent = (($row['total_payment_amount']) / $total) * 100; /*（那个category总共÷全部category的总共）×100=多少%*/
+                                                    if ($percent > 0) { 
+                                                        $accumulated_payment += $percent;
+                                                        echo ($payment_colors[$row['payment_id']] ?? '#6c7a8f') . " 0 " . $accumulated_payment . "%,";
                                                     }
                                                 }
                                                 ?> #e2e8f0 0);">
@@ -300,7 +265,7 @@ $payment_colors = [
                                                     if ($percent > 0): ?>
                                                     <li class="list-group-item d-flex justify-content-between align-items-center p-2" style="border:none; background:transparent;">
                                                         <div>
-                                                            <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $payment_colors[$row['payment_method_id']] ?? '#6c7a8f' ?>;"></span>
+                                                            <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $payment_colors[$row['payment_id']] ?? '#6c7a8f' ?>;"></span>
                                                             <strong><?= $row['payment_name'] ?></strong>
                                                         </div>
                                                         <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= (($row['total_payment_amount'])) ?>)</span>

@@ -31,12 +31,19 @@
         body {
           background: #f1f1f1;
         }
+        .form-label {
+        padding-left: 10px;
+        margin-bottom: 0px;
+        font-family: bold;
+        font-weight: bold;
+        font-size: 18px;
+      }
       </style>
     </head>
     <body>
       <div class="container mx-auto my-5" style="max-width: 700px;">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h1 class="h1">Change Password</h1>
+          <h1 class="h1 p-3 pb-0 fs-3 fw-bold">Change Password</h1>
         </div>
         <div class="card mb-2 p-4">
           <form method="POST" id="changePwdForm">
@@ -48,9 +55,7 @@
                 </div>
                 <input type="hidden" name="id" value="<?= $id ?>">
                 <div class="col">
-                  <label for="confirm_password" class="form-label"
-                    >Confirm Password</label
-                  >
+                  <label for="confirm_password" class="form-label">Confirm Password</label>
                   <input
                     type="password"
                     class="form-control"
@@ -62,16 +67,12 @@
               </div>
             </div>
             <div class="d-grid">
-              <button type="submit" class="btn btn-primary">
-                Change Password
-              </button>
+              <button type="submit" class="btn btn-dark">Change Password</button>
             </div>
           </form>
         </div>
         <div class="text-center">
-          <a href="manage-user.php" class="btn btn-link btn-sm"
-            ><i class="bi bi-arrow-left"></i> Back to Users</a
-          >
+          <a href="manage-user.php" class="btn-sm text-black fw-bold text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Back to Users</a>
         </div>
       </div>
     <script src="theme.js"></script>

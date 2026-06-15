@@ -33,41 +33,11 @@ if (isset($_POST['delete_goal'])) {
 }
 
 $user_goals = $_SESSION['my_goals'][$user_id];
+$category_results = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getCategorySum&user_id=$user_id");
+$category_results = json_decode($category_results, true);
 
-$categoryQuery = "SELECT 
-                categories.id AS category_id,
-                categories.category_name, 
-            IFNULL(( 
-                SELECT SUM(expenses.amount) FROM expenses 
-                WHERE expenses.category_id = categories.id AND expenses.user_id = :user_id
-                ), 0) AS total_category_amount,
-                
-                IFNULL(budgets.budget_amount, 1000) AS budget_limit
-             FROM categories
-             LEFT JOIN budgets ON categories.id = budgets.category_id AND budgets.user_id = :user_id
-             GROUP BY categories.id, categories.category_name, budgets.budget_amount";
-
-$stmtCategory = $db->prepare($categoryQuery);
-$stmtCategory->execute([':user_id' => $user_id]);
-$results = $stmtCategory->fetchAll(PDO::FETCH_ASSOC);
-
-$paymentQuery = "SELECT 
-                payments.id AS payment_id,
-                payments.payment_name, 
-            IFNULL(( 
-                SELECT SUM(expenses.amount) FROM expenses 
-                WHERE expenses.payment_method_id = payments.id AND expenses.user_id = :user_id
-                ), 0) AS total_payment_amount,
-                
-                IFNULL(budgets.payment_amount, 1000) AS payment_limit
-             FROM payments
-             LEFT JOIN budgets ON payments.id = budgets.payment_id AND budgets.user_id = :user_id
-             GROUP BY payments.id, payments.payment_name, budgets.payment_amount";
-             
-
-$stmtPayment = $db->prepare($paymentQuery);
-$stmtPayment->execute([':user_id' => $user_id]);
-$payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
+$payment_results = file_get_contents("http://localhost/finalproject/backend/index.php?action=getPaymentSum&user_id=$user_id");
+$payment_results = json_decode($payment_results, true);
 ?>
 <!DOCTYPE html>
 <html>
@@ -98,13 +68,9 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
             padding-right: 4px;
         }
         .title a {
-            display: inline-block;
-            font-size: 30px;
             text-decoration: none;
             color: black ;
             font-weight: bold;
-            padding-left: 10px;
-            margin-bottom: 15px;
         }
         .title a:hover {
             color: #333 ;
@@ -118,7 +84,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div class="container py-4 dashboard">
         <div class="title a">
-            <a href="index.php">Limits and Goals</a>
+            <a href="index.php" class="fs-3 p-2"><i class="bi bi-arrow-left-circle"></i> Limits and Goals</a>
         </div>
 
 <!--Limit by Category------------------>
@@ -129,19 +95,19 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                     <p class="text-muted small mb-2">Set monthly budget thresholds</p>
                     
                     <div class="tableno">
-                        <?php foreach ($results as $category_row): ?>
+                        <?php foreach ($category_results as $row): ?>
                             <div class="row align-items-center py-2 border-bottom g-2 mx-0">
                                 <div class="col-6 p-0">
-                                    <span class="fw-bold d-block text-truncate small"><?= $category_row['category_name'] ?></span>
+                                    <span class="fw-bold d-block text-truncate small"><?= $row['category_name'] ?></span>
                                     <span class="text-muted" style="font-size: 0.75rem;">
-                                        RM <?= $category_row['total_category_amount'] ?> / <?= $category_row['budget_limit'] ?>
+                                        RM <?= $row['total_category_amount'] ?> / <?= $row['budget_limit'] ?>
                                     </span>
                                 </div>
                                 <div class="col-6 p-0">
                                     <form method="POST" class="categoryBudgetForm d-flex justify-content-end align-items-center m-0">
-                                        <input type="hidden" name="category_id" value="<?= $category_row['category_id'] ?>">
+                                        <input type="hidden" name="category_id" value="<?= $row['category_id'] ?>">
                                         <div class="input-group input-group-sm" style="max-width: 115px;">
-                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $category_row['budget_limit'] ?>" required style="font-size: 0.75rem;">
+                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $row['budget_limit'] ?>" required style="font-size: 0.75rem;">
                                             <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                         </div>
                                     </form>
@@ -149,7 +115,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="col-12 p-0 mt-1">
                                     <div class="progress overflow-hidden" style="height: 5px;">
                                         <?php 
-                                        $percent = ($category_row['total_category_amount'] / $category_row['budget_limit']) * 100; 
+                                        $percent = ($row['total_category_amount'] / $row['budget_limit']) * 100; 
                                         ?>
                                         <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
 
@@ -169,19 +135,19 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                     <p class="text-muted small mb-2">Monitor account-wide limits</p>
                     
                     <div class="tableno">
-                        <?php foreach ($payment_results as $payment_row): ?>
+                        <?php foreach ($payment_results as $row): ?>
                             <div class="row align-items-center py-2 border-bottom g-2 mx-0">
                                 <div class="col-6 p-0">
-                                    <span class="fw-bold d-block text-truncate small"><?= $payment_row['payment_name'] ?></span>
+                                    <span class="fw-bold d-block text-truncate small"><?= $row['payment_name'] ?></span>
                                     <span class="text-muted" style="font-size: 0.75rem;">
-                                        RM <?= $payment_row['total_payment_amount'] ?> / <?= $payment_row['payment_limit'] ?>
+                                        RM <?= $row['total_payment_amount'] ?> / <?= $row['payment_limit'] ?>
                                     </span>
                                 </div>
                                 <div class="col-6 p-0">
                                     <form method="POST" class="paymentBudgetForm d-flex justify-content-end align-items-center m-0">
-                                        <input type="hidden" name="payment_id" value="<?= $payment_row['payment_id'] ?>">
+                                        <input type="hidden" name="payment_id" value="<?= $row['payment_id'] ?>">
                                         <div class="input-group input-group-sm" style="max-width: 115px;">
-                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $payment_row['payment_limit'] ?>" required style="font-size: 0.75rem;">
+                                            <input type="number" step="0.01" name="amount" class="form-control row-amount" placeholder="Limit" value="<?= $row['payment_limit'] ?>" required style="font-size: 0.75rem;">
                                             <button type="submit" class="btn btn-dark btn-sm">Set</button>
                                         </div>
                                     </form>
@@ -189,7 +155,7 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="col-12 p-0 mt-1">
                                     <div class="progress overflow-hidden" style="height: 5px;">
                                         <?php 
-                                        $percent = ($payment_row['total_payment_amount'] / $payment_row['payment_limit']) * 100; 
+                                        $percent = ($row['total_payment_amount'] / $row['payment_limit']) * 100; 
                                         ?>
                                         <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $percent ?>%; max-width: 100%;"></div>
 
@@ -223,11 +189,11 @@ $payment_results = $stmtPayment->fetchAll(PDO::FETCH_ASSOC);
             </form>
 
             <div class="scrollbar">
-                    <?php if (!empty($user_goals) && is_array($user_goals)): ?>
-                    <?php foreach ($user_goals as $key => $goal): ?>
-                        <?php if (!is_array($goal)) { continue; } 
-                            $percent = 0;
-                        if (isset($goal['target']) && $goal['target'] > 0) {
+                    <?php if (!empty($user_goals) && is_array($user_goals)): ?> <!--only run if code is not empty, if empty then "No active savings goals found. Add one above!"-->
+                    <?php foreach ($user_goals as $key => $goal): ?> 
+                        <?php if (!is_array($goal)) { continue; } //if its not proper array then skip (which mean just ignore and dont broke your page)
+                            $percent = 0; 
+                        if (isset($goal['target']) && $goal['target'] > 0) { //only calc if target exists ; more than 0
                             $percent = ($goal['current'] / $goal['target']) * 100;
                         }
                         ?>

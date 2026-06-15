@@ -44,6 +44,12 @@ body {
     opacity: 0.8; /*Limit and goals word 会有变暗动画*/
 }
 
+.navbar .nav-link {
+    color: var(--text-color) !important; /*add expenses budget logout的字*/
+}
+.navbar .nav-link:hover {
+    color: var(--navbar-brand) !important;
+}
 .profile-logo {
     border-color: var(--text-color) !important; 
     color: var(--text-color) !important;

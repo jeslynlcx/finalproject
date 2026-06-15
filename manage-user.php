@@ -1,6 +1,5 @@
 <?php
 require("header.php");
-
 $query = "SELECT * FROM users ORDER BY id DESC";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -36,12 +35,8 @@ $query = "SELECT * FROM users ORDER BY id DESC";
   <body>
     <div class="container mx-auto my-5" style="max-width: 700px;">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1">Manage Users</h1>
-        <div class="text-end">
-          <a href="manage-user-add.php" class="btn btn-primary btn-sm"
-            >Add New User</a
-          >
-        </div>
+        <h1 class="h1 p-3 pb-0 fs-3 fw-bold">Manage Users</h1>
+        <a href="manage-user-add.php" class="btn btn-dark btn-sm text-end">Add New User</a>
       </div>
       <div class="card mb-2 p-4">
         <table class="table">
@@ -60,13 +55,10 @@ $query = "SELECT * FROM users ORDER BY id DESC";
                 $role_badge = "";
                 switch($user['role']){
                   case'user';
-                  $role_badge = "bg-success";
-                  break;
-                  case'editor';
-                  $role_badge = "bg-info";
+                  $role_badge = "bg-dark";
                   break;
                   case'admin';
-                  $role_badge = "bg-primary";
+                  $role_badge = "bg-dark";
                   break;
                 }
               ?>
@@ -78,14 +70,14 @@ $query = "SELECT * FROM users ORDER BY id DESC";
               <td class="text-end">
                 <div class="buttons">
                   <a href="manage-user-edit.php?id=<?=$user['id']?>"
-                    class="btn btn-success btn-sm me-2"
+                    class="btn btn-dark btn-sm me-2"
                     ><i class="bi bi-pencil"></i></a>
                   <a
                     href="manage-user-changepwd.php?id=<?=$user['id']?>"
-                    class="btn btn-warning btn-sm me-2"
+                    class="btn btn-dark btn-sm me-2"
                     ><i class="bi bi-key"></i></a>
-                  <form method="POST" class="d-inline">
-                  <button class="btn btn-danger btn-sm" type="submit"><i class="bi bi-trash"></i></button>
+                  <form method="POST" action="http://localhost/finalproject/backend/index.php?action=deleteUser" class="d-inline">
+                  <button class="btn btn-dark btn-sm" type="submit"><i class="bi bi-trash"></i></button>
                   <input type="hidden" name="id" value="<?= $user['id']?>">
                   </form>
                 </div>
@@ -96,8 +88,7 @@ $query = "SELECT * FROM users ORDER BY id DESC";
         </table>
       </div>
       <div class="text-center">
-        <a href="index.php" class="btn btn-link btn-sm"
-          ><i class="bi bi-arrow-left"></i> Back to Dashboard</a
+        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a
         >
       </div>
     </div>

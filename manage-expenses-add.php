@@ -1,5 +1,6 @@
 <?php
 require('header.php');
+$user_id = $_SESSION['user']['id'];
 ?>
 
 <!DOCTYPE html>
@@ -37,7 +38,7 @@ require('header.php');
   <body>
     <div class="container mx-auto my-5" style="max-width: 700px;">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1 p-3 pb-0">Add New</h1>
+        <h1 class="h1 p-3 pb-0 fs-3 fw-bold">Add New</h1>
       </div>
       <div class="card mb-2 p-4">
         <form method="POST" id='addPostForm'>
@@ -85,7 +86,7 @@ require('header.php');
           </div>
           <div class="mb-3">
           <div class="text-end">
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="submit" class="btn btn-dark">Add</button>
           </div>
         </form>
       </div>
@@ -117,6 +118,7 @@ require('header.php');
               category_id: $('#category_id').val(),
               payment_method_id: $('#payment_method_id').val(),
               expense_date: $('#expense_date').val(),
+              user_id: "<?= $user_id ?>",
             },
           success: function(response){
                 console.log(response);

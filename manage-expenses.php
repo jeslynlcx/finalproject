@@ -1,32 +1,19 @@
 <?php
 require('header.php');
 $user_id = $_SESSION['user']['id'];
-
+$expenses = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getAllExpenses&user_id=$user_id");
+$expenses = json_decode($expenses, true);
 if (isset($_POST['id'])) {
     $id = $_POST['id'];
-    $deleteQuery = "DELETE FROM expenses WHERE id = :id AND user_id = :user_id";
-    $stmt = $db->prepare($deleteQuery);
-    $stmt->execute([
-        ":id" => $id,
-        ":user_id" => $user_id
-    ]);
-    
-    header("Location: manage-expenses.php");
-    exit();
+$delete = file_get_contents("http://localhost/finalproject/backend/index.php?action=deleteExpense&id=$id&user_id=$user_id");
+header("Location: manage-expenses.php");
+exit();
 }
 
-$query = "SELECT expenses.*, categories.category_name, payments.payment_name 
-          FROM expenses
-          LEFT JOIN categories ON expenses.category_id = categories.id
-          LEFT JOIN payments ON expenses.payment_method_id = payments.id
-          WHERE expenses.user_id = :user_id
-          ORDER BY expenses.id DESC";
-
-$stmt = $db->prepare($query);
-$stmt->execute([":user_id" => $user_id]);
-$expenses = $stmt->fetchAll();
+$expenses = file_get_contents("http://localhost/finalproject/backend/index.php?action=getAllExpenses&user_id=$user_id");
+$expenses = json_decode($expenses, true);
 ?>
-
+ 
 
 <!DOCTYPE html>
 <html>
@@ -80,9 +67,10 @@ $expenses = $stmt->fetchAll();
     </style>
   </head>
   <body>
-    <div class="container mx-auto my-3" style="max-width: 900px;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="h1 p-3 pb-0 pt-0">Manage expense</h1>
+    <div class="container mx-auto py-4" style="max-width: 900px;">
+      <div class="d-flex justify-content-between align-items-center mb-2 row p-4 pb-0 pt-0">
+        <h1 class="h1 pb-0 pt-0 col-10 fs-3 fw-bold">Manage expense</h1>
+        <a href="manage-expenses-add.php" class="col-2 btn btn-sm btn-dark"><i class="bi bi-plus-circle "></i> Add Expenses</a>
       </div>
 
 
@@ -108,7 +96,7 @@ $expenses = $stmt->fetchAll();
                 <td><?= $expense['payment_name']?></td> 
                 <td><?= $expense['expense_date']?></td> 
                     <td class="text-end">
-                      <a href="#viewModal<?= $expense['id'] ?>" class="btn btn-primary btn-sm me-2"><i class="bi bi-eye"></i></a>
+                      <a href="#viewModal<?= $expense['id'] ?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-eye"></i></a>
 
                       <div id="viewModal<?= $expense['id'] ?>" class="popup-overlay">
                         <div class="popup-card text-start" style="color: #333;">
@@ -126,12 +114,11 @@ $expenses = $stmt->fetchAll();
                         </div>
                       </div>
 
-                      <a href="manage-expenses-edit.php?id=<?=$expense['id']?>" class="btn btn-secondary btn-sm me-2"><i class="bi bi-pencil"></i></a>
+                      <a href="manage-expenses-edit.php?id=<?=$expense['id']?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-pencil"></i></a>
                       <form method="POST" class="d-inline">
-                        <button class="btn btn-danger btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-dark btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
                         <input type="hidden" name="id" value="<?= $expense['id']?>">
                       </form>
-                      </div>
                     </td>
               </tr>
               </div>
