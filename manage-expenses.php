@@ -114,7 +114,7 @@ $expenses = json_decode($expenses, true);
                         </div>
                       </div>
 
-                      <a href="manage-expenses-edit.php?id=<?=$expense['id']?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-pencil"></i></a>
+                      <a href="manage-expenses-edit.php?id=<?=$expense['id']?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-pencil-square"></i></a>
                       <form method="POST" class="d-inline">
                         <button class="btn btn-dark btn-sm" type="submit" ><i class="bi bi-trash"></i></button>
                         <input type="hidden" name="id" value="<?= $expense['id']?>">

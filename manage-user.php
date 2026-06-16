@@ -69,13 +69,8 @@ $query = "SELECT * FROM users ORDER BY id DESC";
               <td><span class="badge <?= $role_badge ?>"><?=$user['role']?></span></td>
               <td class="text-end">
                 <div class="buttons">
-                  <a href="manage-user-edit.php?id=<?=$user['id']?>"
-                    class="btn btn-dark btn-sm me-2"
-                    ><i class="bi bi-pencil"></i></a>
-                  <a
-                    href="manage-user-changepwd.php?id=<?=$user['id']?>"
-                    class="btn btn-dark btn-sm me-2"
-                    ><i class="bi bi-key"></i></a>
+                  <a href="manage-user-edit.php?id=<?=$user['id']?>"class="btn btn-dark btn-sm me-2"><i class="bi bi-pencil-square"></i></a>
+                  <a href="manage-user-changepwd.php?id=<?=$user['id']?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-key"></i></a>
                   <form method="POST" action="http://localhost/finalproject/backend/index.php?action=deleteUser" class="d-inline">
                   <button class="btn btn-dark btn-sm" type="submit"><i class="bi bi-trash"></i></button>
                   <input type="hidden" name="id" value="<?= $user['id']?>">
