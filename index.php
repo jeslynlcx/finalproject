@@ -2,7 +2,8 @@
 require('header.php');
 $user_id = $_SESSION['user']['id'];
 
-$expenseQuery = "SELECT IFNULL(SUM(amount), 0) AS total_expenses FROM expenses WHERE user_id = :user_id";
+// expensesQuery for total expenses
+$expenseQuery = "SELECT IFNULL(SUM(amount), 0) AS total_expenses FROM expenses WHERE user_id = :user_id"; /*IF no amount will set as 0 as add up all expense amounts for that user from expenses*/
 $stmtExpense = $db->prepare($expenseQuery);
 $stmtExpense->execute([':user_id' => $user_id]);
 $totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
@@ -10,6 +11,7 @@ $totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
 $expenses = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getAllExpenses&user_id=$user_id");
 $expenses = json_decode($expenses, true);
 
+//totalRow for total category and payment result 
 $totalRowStmt = $db->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id = :user_id");
 $totalRowStmt->execute([':user_id' => $user_id]);
 $totalRow = $totalRowStmt->fetch(PDO::FETCH_ASSOC);

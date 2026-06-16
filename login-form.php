@@ -25,7 +25,7 @@
   </head>
   <body>
     <div class="container my-5 mx-auto" style="max-width: 500px;">
-      <h1 class="h1 mb-4 text-center">Login</h1>
+      <h1 class="h1 pt-5 mb-4 text-center fw-bold fs-3">Login</h1>
 
       <div class="card p-4">
         <form method="POST" action="login.php">
@@ -50,23 +50,14 @@
             />
           </div>
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-dark">Login</button>
           </div>
         </form>
       </div>
 
-      <div
-        class="d-flex justify-content-between align-items-center gap-3 mx-auto pt-3"
-      >
-        <a href="index.php" class="text-decoration-none small"
-          ><i class="bi bi-arrow-left-circle"></i> Go back</a
-        >
-        <a href="register-form.php" class="text-decoration-none small"
-          >Don't have an account? Sign up here
-          <i class="bi bi-arrow-right-circle"></i
-        ></a>
+      <div class="text-center gap-3 mx-auto pt-3">
+        <a href="register-form.php" class="text-decoration-none fw-bold text-black">Don't have an account? Sign up here<i class="bi bi-hand-index-thumb"></i></a>
       </div>
-    </div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

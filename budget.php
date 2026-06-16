@@ -6,8 +6,8 @@ if (!isset($_SESSION['my_goals'][$user_id])) {
 }
 
 // Add Goals
-if (isset($_POST['add_goal'])) {
-    $_SESSION['my_goals'][$user_id][] = [
+if (isset($_POST['add_goal'])) { /*User click*/
+    $_SESSION['my_goals'][$user_id][] = [ /*data save into my goals under their own user*/
         'title' => $_POST['goalName'],
         'target' => $_POST['goalTarget'],
         'current' => $_POST['saved']
@@ -23,16 +23,17 @@ if (isset($_POST['edit_goal'])) {
 // Delete Goals
 if (isset($_POST['delete_goal'])) {
     $key = $_POST['goal_id'];
-    unset($_SESSION['my_goals'][$user_id][$key]);
+    unset($_SESSION['my_goals'][$user_id][$key]); /*It deletes one specific goal from that specific user ist*/
     
     if (is_array($_SESSION['my_goals'][$user_id])) {
         $_SESSION['my_goals'][$user_id] = array_values($_SESSION['my_goals'][$user_id]);
     } else {
-        $_SESSION['my_goals'][$user_id] = [];
+        $_SESSION['my_goals'][$user_id] = []; /*If it is not an array, reset it to empty so that the page wont crash*/
     }
 }
 
 $user_goals = $_SESSION['my_goals'][$user_id];
+
 $category_results = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getCategorySum&user_id=$user_id");
 $category_results = json_decode($category_results, true);
 

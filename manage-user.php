@@ -66,7 +66,7 @@ $query = "SELECT * FROM users ORDER BY id DESC";
               <th scope="row"><?= $user['id']?></th>
               <td><?= $user['name']?></td>
               <td><?= $user['email']?></td>
-              <td><span class="badge <?= $role_badge ?>"><?=ucwords($user['role'])?></span></td>
+              <td><span class="badge <?= $role_badge ?>"><?=$user['role']?></span></td>
               <td class="text-end">
                 <div class="buttons">
                   <a href="manage-user-edit.php?id=<?=$user['id']?>"
