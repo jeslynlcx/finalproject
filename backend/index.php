@@ -63,7 +63,7 @@ switch ($action){
     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : null;
     $paymentQuery = "SELECT payments.id AS payment_id,payments.payment_name, 
             IFNULL(( SELECT SUM(expenses.amount) FROM expenses WHERE expenses.payment_method_id = payments.id AND expenses.user_id = :user_id), 0) AS total_payment_amount,
-            IFNULL(budgets.payment_amount, 1000) AS payment_limit
+            IFNULL(budgets.payment_amount, 1000) AS payment_limit /*if null default 1000*/
             FROM payments
             LEFT JOIN budgets ON payments.id = budgets.payment_id AND budgets.user_id = :user_id
             GROUP BY payments.id, payments.payment_name";

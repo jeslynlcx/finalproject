@@ -37,6 +37,7 @@
               id="name"
               name="name"
               placeholder="Name"
+              required
             />
           </div>
           <div class="mb-2">
@@ -47,6 +48,7 @@
               id="password"
               name="password"
               placeholder="Password"
+              required
             />
           </div>
           <div class="d-grid">
