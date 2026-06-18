@@ -118,3 +118,10 @@ body {
 .text-black, .text-dark, .fw-bold, h1, h2, h3, h4, .h1 {
     color: var(--text-color) !important; 
 }
+
+.role-background {
+    background-color: var(--text-color) !important;
+    color: var(--card-bg) !important;
+    border: 1px solid var(--border-color);
+}
+

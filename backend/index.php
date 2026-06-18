@@ -1,7 +1,7 @@
 <?php
 session_start();
 $db = new PDO("mysql:host=localhost;dbname=b18_finalproject","root","");
-$action = isset($_REQUEST['action']) ?$_REQUEST['action'] : null;
+    $action = isset($_REQUEST['action']) ?$_REQUEST['action'] : null; /* If the key exists, $action gets the value*/
 
 switch ($action){
     // GET
@@ -13,18 +13,26 @@ switch ($action){
           LEFT JOIN payments ON expenses.payment_method_id = payments.id
           WHERE expenses.user_id = :user_id
           ORDER BY expenses.id DESC";
-    $stmt =$db->prepare($query);
-    $stmt->execute([":user_id" => $user_id]);
-    $expenses =$stmt->fetchAll();
-    echo json_encode($expenses);
+    $stmt =$db->prepare($query); /*Prepare a database query, help prevent SQL crash */ /*ready to run*/
+    $stmt->execute([":user_id" => $user_id]); /*fills in the user_id,*/ /*run the query*/
+    $expenses =$stmt->fetchAll(); /*gets all matching expense records*/ /*get the return*/
+    echo json_encode($expenses); /*outputs them as JSON*/
+    break;
+
+    case 'getAllComment':
+    $query = "SELECT * FROM comments ORDER BY id DESC";
+    $stmt = $db->prepare($query);
+    $stmt->execute([]);
+    $comment = $stmt->fetchALL(PDO::FETCH_ASSOC);
+    echo json_encode($comment);
     break;
 
     case 'getOneUser':
     $id = isset($_REQUEST['id']) ?$_REQUEST['id'] : null;
-    $query = "SELECT * FROM users WHERE id=:id";
+    $query = "SELECT * FROM users WHERE id=:id"; /*replaces :id with the value stored in $id*/
     $stmt =$db->prepare($query);
     $stmt->execute([':id' =>$id]);
-    $user =$stmt->fetch(PDO::FETCH_ASSOC);
+    $user =$stmt->fetch(PDO::FETCH_ASSOC); /*returned as an associative array.*/
     echo json_encode($user);
     break;
 
@@ -41,7 +49,6 @@ switch ($action){
     echo json_encode($expense ? $expense : []);
     break;
     
-
     case 'getOneCategory':
     $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
     $query = "SELECT * FROM categories WHERE id = :id";
@@ -50,6 +57,7 @@ switch ($action){
     $category = $stmt->fetch(PDO::FETCH_ASSOC);
     echo json_encode($category);
     break;
+
 
     case'getPaymentSum':
     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : null;
@@ -225,6 +233,22 @@ switch ($action){
         ":category_id" =>$category_id,
         ":expense_date" =>$expense_date,
         ":payment_method_id" =>$payment_method_id,
+        ":user_id" =>$user_id
+    ]);
+    echo json_encode(["status" => "success"]);
+    
+    exit(); 
+    break;
+
+    case 'addComment':
+    $comment =$_POST['comment'];
+    $user_id =$_POST['user_id'];
+
+    $query = "INSERT INTO comments (comment, user_id) VALUES (:comment, :user_id)";
+
+    $stmt =$db->prepare($query);
+    $stmt->execute([
+        ":comment" =>$comment,
         ":user_id" =>$user_id
     ]);
     echo json_encode(["status" => "success"]);

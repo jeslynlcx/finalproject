@@ -2,8 +2,8 @@
 require('header.php');
 $user_id = $_SESSION['user']['id'];
 
-// expensesQuery for total expenses
-$expenseQuery = "SELECT IFNULL(SUM(amount), 0) AS total_expenses FROM expenses WHERE user_id = :user_id"; /*IF no amount will set as 0 as add up all expense amounts for that user from expenses*/
+// expensesQuery for Total data 的 total expenses
+$expenseQuery = "SELECT IFNULL(SUM(amount), 0) AS total_expenses FROM expenses WHERE user_id = :user_id"; /*IF no amount， will set as 0 as，， add up all expense amounts from expenses*/
 $stmtExpense = $db->prepare($expenseQuery);
 $stmtExpense->execute([':user_id' => $user_id]);
 $totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
@@ -11,12 +11,13 @@ $totalExpenses = $stmtExpense->fetch(PDO::FETCH_ASSOC)['total_expenses'];
 $expenses = file_get_contents ("http://localhost/finalproject/backend/index.php?action=getAllExpenses&user_id=$user_id");
 $expenses = json_decode($expenses, true);
 
-//totalRow for total category and payment result 
+//total category的sum， for piechart算法用的
 $totalRowStmt = $db->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id = :user_id");
 $totalRowStmt->execute([':user_id' => $user_id]);
 $totalRow = $totalRowStmt->fetch(PDO::FETCH_ASSOC);
 $total = $totalRow['total'] ? ($totalRow['total']) : 1; 
 
+//category的一个的sum
 $category_results = file_get_contents("http://localhost/finalproject/backend/index.php?action=getCategorySum&user_id=$user_id");
 $category_results = json_decode($category_results, true);
 $colors = [
@@ -85,12 +86,17 @@ $payment_colors = [
         .card{
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
+        .carousel-btn button{
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
     </style>
 </head>
 
 <body>
 <!-- NAVBARRRRRR------------------>
-    <div class="container-fluid py-3">
+    <div class="container-fluid">
     <div class="mx-auto dashboard">
         <nav class="navbar navbar-expand-lg pb-0">            
             <span id="themeToggle" class="fw-bold fs-3 p-2">Money Manager  <i class="bi bi-toggle-on"></i></span>
@@ -180,24 +186,16 @@ $payment_colors = [
                                                 Analytics <span class="text-dark fw-bold ms-1" style="font-size: 0.75rem;">(By Category)</span>
                                             </h6>
                                             
-                                            <div class="d-flex align-items-center gap-1">
-                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" 
-                                                        type="button" data-bs-target="#chartCarousel" data-bs-slide="prev" 
-                                                        style="width: 26px; height: 26px; border-radius: 50%;">
-                                                    <i class="bi bi-chevron-left" style="font-size: 0.75rem;"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" 
-                                                        type="button" data-bs-target="#chartCarousel" data-bs-slide="next" 
-                                                        style="width: 26px; height: 26px; border-radius: 50%;">
-                                                    <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
-                                                </button>
+                                            <div class="carousel-btn d-flex align-items-center gap-1">
+                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" type="button" data-bs-target="#chartCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left" style="font-size: 0.75rem;"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0 shadow-sm" type="button" data-bs-target="#chartCarousel" data-bs-slide="next"><i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i></button>
                                             </div>
                                         </div>
 
                                         <div class="text-center">
                                             <div class="pie mx-auto mb-3" style="background: conic-gradient(
                                                 <?php 
-                                                $accumulated = 0; /*从0开始累计*/ 
+                                                $accumulated = 0; /*从0开始累计 usign the cummulaive method to add on%*/ 
                                                 foreach ($category_results as $row) {
                                                     $percent = (($row['total_category_amount']) / $total) * 100; /*（那个category总共÷全部category的总共）×100=多少%*/
                                                     if ($percent > 0) { 
@@ -214,7 +212,7 @@ $payment_colors = [
                                                     if ($percent > 0): ?> <!--Only show categories that have spending-->
                                                     <li class="list-group-item d-flex justify-content-between align-items-center p-0" style="border:none; background:transparent;">
                                                         <div>
-                                                            <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $colors[$row['category_id']] ?>;"></span>
+                                                            <span style="width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:8px; background:<?= $colors[$row['category_id']] ?>;"></span> <!--小方块-->
                                                             <strong><?= $row['category_name'] ?></strong>
                                                         </div>
                                                         <span class="text-muted" style="font-size: 0.85rem;"><?= $percent ?>% (RM <?= ($row['total_category_amount']) ?>)</span>
@@ -233,26 +231,18 @@ $payment_colors = [
                                                 <span class="text-dark fw-bold ms-1" style="font-size: 0.75rem;">(By Payment)</span>
                                             </h6>
                                             
-                                            <div class="d-flex align-items-center gap-1">
-                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" 
-                                                        type="button" data-bs-target="#chartCarousel" data-bs-slide="prev" 
-                                                        style="width: 26px; height: 26px; border-radius: 50%;">
-                                                    <i class="bi bi-chevron-left" style="font-size: 0.75rem;"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" 
-                                                        type="button" data-bs-target="#chartCarousel" data-bs-slide="next" 
-                                                        style="width: 26px; height: 26px; border-radius: 50%;">
-                                                    <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
-                                                </button>
+                                            <div class="carousel-btn d-flex align-items-center gap-1">
+                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" type="button" data-bs-target="#chartCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left" style="font-size: 0.75rem;"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0" type="button" data-bs-target="#chartCarousel" data-bs-slide="next"><i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i></button>
                                             </div>
                                         </div>
 
                                         <div class="text-center">
                                             <div class="pie mx-auto mb-3" style="background: conic-gradient(
                                                 <?php 
-                                                $accumulated_payment = 0; /*从0开始累计*/ 
+                                                $accumulated_payment = 0;
                                                 foreach ($payment_results as $row) {
-                                                    $percent = (($row['total_payment_amount']) / $total) * 100; /*（那个category总共÷全部category的总共）×100=多少%*/
+                                                    $percent = (($row['total_payment_amount']) / $total) * 100;
                                                     if ($percent > 0) { 
                                                         $accumulated_payment += $percent;
                                                         echo ($payment_colors[$row['payment_id']] ?? '#6c7a8f') . " 0 " . $accumulated_payment . "%,";
@@ -286,7 +276,9 @@ $payment_colors = [
 
         </div> <!--div class="row"-->
 <!-- Category Pie Chart -->
-
+        <div class="text-center gap-3 mx-auto pt-1">
+            <a href="feedback.php" class="text-decoration-none fw-bold text-black">Feedback<i class="bi bi-headset"></i></a>
+        </div>
     </div> <!--second div-->
     </div> <!--first div-->
     <script

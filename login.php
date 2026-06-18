@@ -15,19 +15,19 @@ $stmt->execute(array(
 ));
 $user = $stmt->fetchAll();
 $is_password_match = password_verify($password, $user[0]['password']);
-echo $is_password_match ? "<h1>Correct password!</h1>" : "<h1>Wrong password!</h1>";
+echo $is_password_match ? "<h1>Correct password!</h1>" : "<h1>Error!</h1>";
 
 if($is_password_match){
     $_SESSION['user'] = $user[0];
     header("Location: index.php");
-
+    
 }
 }else{
     echo "<h1>User is already logged in!</h1>";
     print_r($_SESSION['user']);    
-    header("Location: post.php");
+    header("Location: login-form.php");
 }
 
-echo "<h2><a href='./logout.php?logout=true'>Click here to logout</a></h2>";
+echo "<h2><a href='./login-form.php?logout=true'>Name/Password does not match</a></h2>";
 
 ?>

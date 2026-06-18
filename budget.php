@@ -1,8 +1,8 @@
 <?php
 require('header.php');
 $user_id = $_SESSION['user']['id'];
-if (!isset($_SESSION['my_goals'][$user_id])) {
-    $_SESSION['my_goals'][$user_id] = [];
+if (!isset($_SESSION['my_goals'][$user_id])) { /* asks the system does this specific user have a goals list setup yet if no */
+    $_SESSION['my_goals'][$user_id] = []; /*run empty list so that wont crash */
 }
 
 // Add Goals
@@ -23,12 +23,12 @@ if (isset($_POST['edit_goal'])) {
 // Delete Goals
 if (isset($_POST['delete_goal'])) {
     $key = $_POST['goal_id'];
-    unset($_SESSION['my_goals'][$user_id][$key]); /*It deletes one specific goal from that specific user ist*/
+    unset($_SESSION['my_goals'][$user_id][$key]); /*It deletes one specific goal from that specific user list*/
     
     if (is_array($_SESSION['my_goals'][$user_id])) {
-        $_SESSION['my_goals'][$user_id] = array_values($_SESSION['my_goals'][$user_id]);
+        $_SESSION['my_goals'][$user_id] = array_values($_SESSION['my_goals'][$user_id]); /*run array values reset the numbering filling the gap after delete anything in the middle*/
     } else {
-        $_SESSION['my_goals'][$user_id] = []; /*If it is not an array, reset it to empty so that the page wont crash*/
+        $_SESSION['my_goals'][$user_id] = []; /*If the lists doent exits or data corrupted reset it to empty so that the page wont crash*/
     }
 }
 

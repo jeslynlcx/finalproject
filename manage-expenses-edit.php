@@ -60,7 +60,7 @@ $expense = json_decode($expense, true);
                 <select name="payment_method_id" id="payment_method_id" class="form-select">
                   <option value="">Select an option</option>
                   <option value="1" <?= (($expense['payment_method_id'] ?? 0) === 1) ? 'selected' : '' ?>>Cash</option>
-                  <option value="2" <?= (($expense['payment_method_id'] ?? 0) === 2) ? 'selected' : '' ?>>Credit Card</option>
+                  <option value="2" <?= (($expense['payment_method_id'] ?? 0) === 2) ? 'selected' : '' ?>>Debit Card</option>
                   <option value="3" <?= (($expense['payment_method_id'] ?? 0) === 3) ? 'selected' : '' ?>>Touch & Go</option>
                 </select>
               </div>

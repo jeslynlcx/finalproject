@@ -50,7 +50,7 @@ $user_id = $_SESSION['user']['id'];
           <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <input type="text" class="form-control" id="description" name="description" />
-            </div>
+          </div>
           <div class="mb-3">
           <label for="amount" class="form-label">Amount</label>
           <input type="number" step="0.01" min="0" class="form-control" id="amount" name="amount" placeholder="RM00.00" required/>
@@ -60,7 +60,7 @@ $user_id = $_SESSION['user']['id'];
           <label for="payment_method_id" class="form-label">Payment Method</label>
           <select name="payment_method_id" id="payment_method_id" class="form-select" value="<?= $expenses['payment_name']?>" required>
             <option value="1">Cash</option>
-            <option value="2">Credit Card</option>
+            <option value="2">Debit Card</option>
             <option value="3">Touch & Go</option>
           </select>
           </div>
@@ -91,8 +91,7 @@ $user_id = $_SESSION['user']['id'];
         </form>
       </div>
       <div class="text-center">
-        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"
-          ><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
+        <a href="index.php" class="btn-sm text-black fw-bold text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Back to Dashboard</a>
       </div>
       
     </div>

@@ -33,8 +33,8 @@ $query = "SELECT * FROM users ORDER BY id DESC";
     </style>
   </head>
   <body>
-    <div class="container mx-auto my-5" style="max-width: 700px;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="container mx-auto my-5" style="max-width: 900px;">
+      <div class="d-flex justify-content-between align-items-center pb-2">
         <h1 class="h1 p-3 pb-0 fs-3 fw-bold">Manage Users</h1>
         <a href="manage-user-add.php" class="btn btn-dark btn-sm text-end">Add New User</a>
       </div>
@@ -55,10 +55,10 @@ $query = "SELECT * FROM users ORDER BY id DESC";
                 $role_badge = "";
                 switch($user['role']){
                   case'user';
-                  $role_badge = "bg-dark";
+                  $role_badge = "role-background";
                   break;
                   case'admin';
-                  $role_badge = "bg-dark";
+                  $role_badge = "role-background";
                   break;
                 }
               ?>
