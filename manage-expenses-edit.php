@@ -1,5 +1,8 @@
 <?php
-require('header.php');
+if(!isset($_SESSION['user'])){
+    header("Location: manage-expenses.php");
+    exit;
+}
 $id = $_GET['id'];
 $user_id = $_SESSION['user']['id'];
 $expense = file_get_contents("http://localhost/finalproject/backend/index.php?action=getOneExpense&id=$id&user_id=$user_id");
