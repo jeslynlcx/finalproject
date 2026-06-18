@@ -71,10 +71,12 @@ $query = "SELECT * FROM users ORDER BY id DESC";
                 <div class="buttons">
                   <a href="manage-user-edit.php?id=<?=$user['id']?>"class="btn btn-dark btn-sm me-2"><i class="bi bi-pencil-square"></i></a>
                   <a href="manage-user-changepwd.php?id=<?=$user['id']?>" class="btn btn-dark btn-sm me-2"><i class="bi bi-key"></i></a>
+                  <?php if ($_SESSION['user']['role'] == "admin" && $user['role'] != "admin"): ?>
                   <form method="POST" action="http://localhost/finalproject/backend/index.php?action=deleteUser" class="d-inline">
                   <button class="btn btn-dark btn-sm" type="submit"><i class="bi bi-trash"></i></button>
                   <input type="hidden" name="id" value="<?= $user['id']?>">
                   </form>
+                    <?php endif; ?>
                 </div>
               </td>
             </tr>
