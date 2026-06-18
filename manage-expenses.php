@@ -64,6 +64,10 @@ $expenses = json_decode($expenses, true);
           opacity: 1;
           pointer-events: auto;
       }
+      td, th {
+          white-space: normal;
+          word-break: break-word;
+        }
     </style>
   </head>
   <body>
@@ -79,11 +83,11 @@ $expenses = json_decode($expenses, true);
           <thead>
             <tr>
               <th scope="col">Title</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Category</th>
-              <th scope="col">Payment</th>
-              <th scope="col">Date</th>
-              <th scope="col" class="text-center">Actions</th>
+              <th scope="col" width="14%">Amount</th>
+              <th scope="col" width="14%">Category</th>
+              <th scope="col" width="14%">Payment</th>
+              <th scope="col" width="14%">Date</th>
+              <th scope="col" class="text-center" width="17%">Actions</th>
             </tr>
           </thead>
           <tbody>
