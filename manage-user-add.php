@@ -1,8 +1,5 @@
 <?php
-if(!isset($_SESSION['user'])){
-    header("Location: manage-user.php");
-    exit;
-}
+ require("header.php");
 ?>
 <!DOCTYPE html>
 <html>

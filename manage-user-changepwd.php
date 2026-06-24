@@ -1,10 +1,5 @@
   <?php
   require("header.php");
-
-  if(!isset($_GET['id'])){
-      header("Location: manage-user.php");
-      exit;
-  }
   $id = $_GET['id'];
   ?>
 

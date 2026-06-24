@@ -1,8 +1,6 @@
 <?php
-if(!isset($_SESSION['user'])){
-    header("Location: manage-expenses.php");
-    exit;
-}
+require('header.php');
+
 $user_id = $_SESSION['user']['id'];
 ?>
 

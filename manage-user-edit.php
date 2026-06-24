@@ -1,8 +1,6 @@
 <?php
-if(!isset($_SESSION['user'])){
-    header("Location: manage-user.php");
-    exit;
-}
+require('header.php');
+
 $id = $_GET['id'];
 $user = file_get_contents("http://localhost/finalproject/backend/index.php?action=getOneUser&id=$id");
 $user = json_decode($user, true);
